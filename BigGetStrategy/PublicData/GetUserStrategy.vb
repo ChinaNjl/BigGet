@@ -226,6 +226,7 @@ Namespace PublicData
         ''' 启动策略
         ''' </summary>
         ''' <param name="_dr"></param>
+        ''' <param name="_bgwList"></param>
         ''' <returns></returns>
         Private Function StartStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
 
@@ -266,6 +267,29 @@ Namespace PublicData
         ''' <returns></returns>
         Private Function StopStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
 
+            If _dr.Item("state") = 102 Then
+
+                Dim FindRunStrategy As Boolean = False
+                Dim tmpRunStrategy As Strategy.GridContract = Nothing
+
+                For Each s As Strategy.GridContract In _bgwList
+
+                    If s.Id = _dr.Item("id") Then
+                        '暂停指定策略正在运行中
+                        FindRunStrategy = True
+                        tmpRunStrategy = s
+                        Exit For
+                    End If
+                Next
+
+                If FindRunStrategy = True Then
+                    _bgwList.Remove(tmpRunStrategy)
+                End If
+
+                Return True
+            Else
+                Return False
+            End If
         End Function
 
     End Class
