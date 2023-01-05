@@ -202,9 +202,13 @@ Namespace PublicData
                         '先启动，后关闭
                         If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
                             dt = ds.Tables(TableName)
+                            For Each dr As DataRow In dt.Rows
 
+                                If StartStrategy(dr, bgwList) = False Then
+                                    StopStrategy(dr, bgwList)
+                                End If
 
-
+                            Next
                         End If
 
                     End If
@@ -213,14 +217,56 @@ Namespace PublicData
 
                 End If
 
-
                 Sleep(3000)
             Loop
 
-
-
         End Sub
 
+        ''' <summary>
+        ''' 启动策略
+        ''' </summary>
+        ''' <param name="_dr"></param>
+        ''' <returns></returns>
+        Private Function StartStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
+
+            If _dr.Item("state") = 101 Then
+
+                If _dr.Item("strategytypeid") = 1001 Then
+
+                    Dim FindRunStrategy As Boolean = False
+                    For Each s As Strategy.GridContract In _bgwList
+                        If s.Id = _dr.Item("id") Then
+                            FindRunStrategy = True
+                            Exit For
+                        End If
+                    Next
+
+                    If FindRunStrategy = False Then
+                        '当策略不存在运行列表中，则启动新策略
+                        Dim sobject As New Strategy.GridContract(_dr)
+                        sobject.Run()
+                        _bgwList.Add(sobject)
+                    End If
+
+                End If
+
+                Return True
+            Else
+                Return False
+            End If
+
+
+        End Function
+
+        ''' <summary>
+        ''' 停止策略
+        ''' </summary>
+        ''' <param name="_dr"></param>
+        ''' <param name="_bgwList"></param>
+        ''' <returns></returns>
+        Private Function StopStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
+
+        End Function
 
     End Class
 
