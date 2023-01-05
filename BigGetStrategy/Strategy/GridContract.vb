@@ -10,21 +10,22 @@ Imports MySql.Data.MySqlClient
 
 Namespace Strategy
     Public Class GridContract
+        Public ReadOnly Property Id As String
+            Get
+                Return ds.Tables(TableName).Rows(0).Item("id")
+            End Get
+        End Property
+
 
 
         Private dr As DataRow
         Private UserInfo As UserInfo
         Private UserCall As UserCall
         Private ds As New DataSet
+
+
+
         Private Property myadp As MySqlDataAdapter
-
-
-
-        Public ReadOnly Property Id As String
-            Get
-                Return ds.Tables(TableName).Rows(0).Item("id")
-            End Get
-        End Property
 
         Private ReadOnly Property symbol As String
             Get
@@ -185,6 +186,11 @@ Namespace Strategy
             End If
 
         End Sub
+
+        Public Sub StopRun()
+
+        End Sub
+
 
 
         Public Sub DoWorkRunStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)

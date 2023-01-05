@@ -13,11 +13,10 @@ Namespace PublicData
         Public Property ds As DataSet
         Public Property sql As New UserType.SqlInfo
         Public Property userKey As New Api.UserInfo
-        Public ReadOnly Property TableName As String
-            Get
-                Return "strategytable"
-            End Get
-        End Property
+        Public ReadOnly Property TableName As String = "strategytable"
+        Public ReadOnly Property ColName As String = "id,strategytypeid,state"
+
+
         Public Property bgwList As New List(Of Strategy.GridContract)
         Public ReadOnly Property BgwCount As Integer
             Get
@@ -36,14 +35,13 @@ Namespace PublicData
         End Property
 
 
-
         ''' <summary>
         ''' sql命令模板
         ''' </summary>
         ''' <returns></returns>
         Private ReadOnly Property expSql As String
             Get
-                Dim str As String = "select id,strategytypeid from {0} where state=101"
+                Dim str As String = "select id,strategytypeid,state from {0} where state=101"
                 Return str
 
             End Get
@@ -59,17 +57,17 @@ Namespace PublicData
             Return BuildSql(TableName, whereStr)
         End Function
 
-        Public Function BuildSql(ByVal tableName As String, ByVal whereStr As String) As String
-            Return BuildSql("id,strategytypeid,state", tableName, whereStr)
+        Public Function BuildSql(ByVal _tableName As String, ByVal _whereStr As String) As String
+            Return BuildSql(ColName, _tableName, _whereStr)
         End Function
 
-        Public Function BuildSql(ByVal colName As String, ByVal tableName As String, ByVal whereStr As String) As String
+        Public Function BuildSql(ByVal _colName As String, ByVal _tableName As String, ByVal _whereStr As String) As String
 
             Dim sql As String = "select {colName} from {tableName} where {where}"
 
-            sql = sql.Replace("{colName}", colName)
-            sql = sql.Replace("{tableName}", tableName)
-            sql = sql.Replace("{where}", whereStr)
+            sql = sql.Replace("{colName}", _colName)
+            sql = sql.Replace("{tableName}", _tableName)
+            sql = sql.Replace("{where}", _whereStr)
 
             Return sql
         End Function
@@ -79,37 +77,7 @@ Namespace PublicData
         ''' </summary>
         Public Function OpenTableFromDatabase() As Boolean
 
-
-
-            Return OpenTableFromDatabase(sql.ConnectStr, expSql, TableName)
-
-            Dim conn As New MySqlConnection(sql.ConnectStr)
-
-            Try
-                conn.Open()
-            Catch ex As Exception
-                Return False
-            End Try
-
-
-            Dim commandStr As String = expSql.Replace("{0}", TableName)
-            myadp = New MySqlDataAdapter(commandStr, conn)
-            Dim commandBuilder As New MySqlCommandBuilder(myadp)
-
-            ds = New DataSet
-
-            Try
-                SyncLock ds
-                    myadp.Fill(ds, TableName)   '将读取到的内容存入ds中
-                End SyncLock
-            Catch ex As Exception
-                Debug.Print(ex.Message)
-                Return False
-            End Try
-
-            Return True
-
-
+            Return OpenTableFromDatabase(sql.ConnectStr, BuildSql("state=101 or state=102"), TableName)
 
         End Function
 
@@ -181,11 +149,6 @@ Namespace PublicData
         End Sub
 
 
-
-
-
-
-
         Public Sub Run()
             If bgw.IsBusy = False Then
                 AddHandler bgw.DoWork, AddressOf DoWorkUserStrategy
@@ -239,35 +202,26 @@ Namespace PublicData
         Public Sub DoWorkUserStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
             Do
-                If OpenTableFromDatabase() = True Then
 
-                    Dim dt As DataTable = ds.Tables(TableName)
+                Dim dt As DataTable = ds.Tables(TableName)
 
-                    '先启动，后关闭
-                    If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
-                        dt = ds.Tables(TableName)
-                        For Each dr As DataRow In dt.Rows
+                '先启动，后关闭
+                If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
+                    dt = ds.Tables(TableName)
+                    For Each dr As DataRow In dt.Rows
 
-                            If StartStrategy(dr, bgwList) = False Then
-                                StopStrategy(dr, bgwList)
-                            End If
+                        If StartStrategy(dr, bgwList) = False Then
+                            StopStrategy(dr, bgwList)
+                        End If
 
-                        Next
-                    End If
-
-
-
+                    Next
                 End If
+
                 Debug.Print(BgwCount)
                 Sleep(3000)
             Loop
 
         End Sub
-
-
-
-
-
 
 
         ''' <summary>
