@@ -19,6 +19,23 @@ Namespace PublicData
             End Get
         End Property
         Public Property bgwList As New List(Of Strategy.GridContract)
+        Public ReadOnly Property BgwCount As Integer
+            Get
+                Return bgwList.Count
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' 检查后台任务运行状态
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property WorkerIsBusy() As Boolean
+            Get
+                Return bgw.IsBusy
+            End Get
+        End Property
+
+
 
         ''' <summary>
         ''' sql命令模板
@@ -32,8 +49,6 @@ Namespace PublicData
             End Get
         End Property
 
-
-
         Private myadp As MySqlDataAdapter
         Private bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
 
@@ -45,7 +60,7 @@ Namespace PublicData
         End Function
 
         Public Function BuildSql(ByVal tableName As String, ByVal whereStr As String) As String
-            Return BuildSql("id,strategytypeid", tableName, whereStr)
+            Return BuildSql("id,strategytypeid,state", tableName, whereStr)
         End Function
 
         Public Function BuildSql(ByVal colName As String, ByVal tableName As String, ByVal whereStr As String) As String
@@ -54,7 +69,7 @@ Namespace PublicData
 
             sql = sql.Replace("{colName}", colName)
             sql = sql.Replace("{tableName}", tableName)
-            sql = sql.Replace("{whereStr}", whereStr)
+            sql = sql.Replace("{where}", whereStr)
 
             Return sql
         End Function
@@ -165,13 +180,11 @@ Namespace PublicData
             bgw.CancelAsync()
         End Sub
 
-        ''' <summary>
-        ''' 检查后台任务运行状态
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function WorkerIsBusy() As Boolean
-            Return bgw.IsBusy
-        End Function
+
+
+
+
+
 
         Public Sub Run()
             If bgw.IsBusy = False Then
@@ -182,14 +195,14 @@ Namespace PublicData
         End Sub
 
 
-        Public Sub DoWorkUserStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
+        Public Sub DoWorkUserStrategy1(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
             Do
                 If OpenTableFromDatabase() = True Then
 
                     Dim dt As DataTable = ds.Tables(TableName)
 
-                    If bgwList.Count = 0 Then
+                    If bgwList.Count = 0 Or False Then
 
                         For Each dr As DataRow In dt.Rows
                             Dim sobject As New Strategy.GridContract(dr)
@@ -221,6 +234,41 @@ Namespace PublicData
             Loop
 
         End Sub
+
+
+        Public Sub DoWorkUserStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
+
+            Do
+                If OpenTableFromDatabase() = True Then
+
+                    Dim dt As DataTable = ds.Tables(TableName)
+
+                    '先启动，后关闭
+                    If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
+                        dt = ds.Tables(TableName)
+                        For Each dr As DataRow In dt.Rows
+
+                            If StartStrategy(dr, bgwList) = False Then
+                                StopStrategy(dr, bgwList)
+                            End If
+
+                        Next
+                    End If
+
+
+
+                End If
+                Debug.Print(BgwCount)
+                Sleep(3000)
+            Loop
+
+        End Sub
+
+
+
+
+
+
 
         ''' <summary>
         ''' 启动策略
