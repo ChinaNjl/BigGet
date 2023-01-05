@@ -1,0 +1,6 @@
+APIKey：
+bg_ac73bd7ce9b4f500bdc99adba3fcfdee
+SecretKey：
+9fef2fcce8a9dd0a418ee0bcbae161afe1d114eb27f040e57ab613163a4d9828
+Passphrase：
+njl12345678
