@@ -222,9 +222,8 @@ Namespace Strategy
                         If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 0 Then
 
                             OrderOpenShort()
-                            Sleep(1000)
                             OrderOpenLong()
-                            Sleep(1000)
+
                         Else
 
                             If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 1 Then
@@ -233,10 +232,9 @@ Namespace Strategy
                                 '设置基准价
                                 ds.Tables(TableName).Rows(0).Item("basePrice") = upPrice
                                 OrderOpenLong()
-                                Sleep(500)
+
                                 If ret.FindOrderType("open_short", upPrice) = 0 Then
                                     OrderOpenShort()
-                                    Sleep(500)
                                 End If
 
                                 Update()
@@ -247,10 +245,8 @@ Namespace Strategy
                                     '设置基准价
                                     ds.Tables(TableName).Rows(0).Item("basePrice") = downPrice
                                     OrderOpenShort()
-                                    Sleep(500)
                                     If ret.FindOrderType("open_long", downPrice) = 0 Then
                                         OrderOpenLong()
-                                        Sleep(500)
                                     End If
 
                                     Update()
@@ -381,8 +377,10 @@ Namespace Strategy
             Try
                 ret = UserCall.OrderBatchOrders(BatchPrarm)
                 If ret.data.orderInfo.Count > 0 Then
+                    Sleep(500)
                     Return True
                 Else
+                    Sleep(500)
                     Return False
                 End If
 
@@ -416,8 +414,10 @@ Namespace Strategy
             Try
                 ret = UserCall.OrderBatchOrders(BatchPrarm)
                 If ret.data.orderInfo.Count > 0 Then
+                    Sleep(500)
                     Return True
                 Else
+                    Sleep(500)
                     Return False
                 End If
 
