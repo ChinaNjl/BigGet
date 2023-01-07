@@ -35,24 +35,16 @@ Namespace PublicData
         End Property
 
 
-        ''' <summary>
-        ''' sql命令模板
-        ''' </summary>
-        ''' <returns></returns>
-        Private ReadOnly Property expSql As String
-            Get
-                Dim str As String = "select id,strategytypeid,state from {0} where state=101"
-                Return str
-
-            End Get
-        End Property
-
         Private myadp As MySqlDataAdapter
         Private bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
 
 
 
-
+        ''' <summary>
+        ''' 构建sql命令
+        ''' </summary>
+        ''' <param name="whereStr"></param>
+        ''' <returns></returns>
         Public Function BuildSql(ByVal whereStr As String) As String
             Return BuildSql(TableName, whereStr)
         End Function
@@ -120,27 +112,6 @@ Namespace PublicData
 
 
 
-
-
-        ''' <summary>
-        ''' 更新变动的数据
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function Update() As Boolean
-
-
-            Try
-                myadp.Update(ds, TableName)
-            Catch ex As Exception
-                Debug.Print(ex.Message)
-                Return False
-            End Try
-
-
-            Return True
-        End Function
-
-
         ''' <summary>
         ''' 停止后台线程
         ''' </summary>
@@ -148,54 +119,12 @@ Namespace PublicData
             bgw.CancelAsync()
         End Sub
 
-
         Public Sub Run()
             If bgw.IsBusy = False Then
                 AddHandler bgw.DoWork, AddressOf DoWorkUserStrategy
                 'AddHandler bgw.ProgressChanged, AddressOf ProgressChanged_GetTickeets
                 bgw.RunWorkerAsync()
             End If
-        End Sub
-
-
-        Public Sub DoWorkUserStrategy1(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
-
-            Do
-                If OpenTableFromDatabase() = True Then
-
-                    Dim dt As DataTable = ds.Tables(TableName)
-
-                    If bgwList.Count = 0 Or False Then
-
-                        For Each dr As DataRow In dt.Rows
-                            Dim sobject As New Strategy.GridContract(dr)
-                            sobject.Run()
-                            bgwList.Add(sobject)
-                        Next
-
-                    Else
-
-                        '先启动，后关闭
-                        If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
-                            dt = ds.Tables(TableName)
-                            For Each dr As DataRow In dt.Rows
-
-                                If StartStrategy(dr, bgwList) = False Then
-                                    StopStrategy(dr, bgwList)
-                                End If
-
-                            Next
-                        End If
-
-                    End If
-
-
-
-                End If
-
-                Sleep(3000)
-            Loop
-
         End Sub
 
 
@@ -279,6 +208,7 @@ Namespace PublicData
                     If s.Id = _dr.Item("id") Then
                         '暂停指定策略正在运行中
                         FindRunStrategy = True
+                        s.StopRun()
                         tmpRunStrategy = s
                         Exit For
                     End If
@@ -286,6 +216,7 @@ Namespace PublicData
 
                 If FindRunStrategy = True Then
                     _bgwList.Remove(tmpRunStrategy)
+
                 End If
 
                 Return True
@@ -293,6 +224,26 @@ Namespace PublicData
                 Return False
             End If
         End Function
+
+
+        ''' <summary>
+        ''' 更新变动的数据
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Update() As Boolean
+
+
+            Try
+                myadp.Update(ds, TableName)
+            Catch ex As Exception
+                Debug.Print(ex.Message)
+                Return False
+            End Try
+
+
+            Return True
+        End Function
+
 
     End Class
 

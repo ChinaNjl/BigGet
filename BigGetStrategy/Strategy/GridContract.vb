@@ -15,16 +15,13 @@ Namespace Strategy
                 Return ds.Tables(TableName).Rows(0).Item("id")
             End Get
         End Property
-
+        Public Property State As Boolean = False
 
 
         Private dr As DataRow
         Private UserInfo As UserInfo
         Private UserCall As UserCall
         Private ds As New DataSet
-
-
-
         Private Property myadp As MySqlDataAdapter
 
         Private ReadOnly Property symbol As String
@@ -165,9 +162,6 @@ Namespace Strategy
 
         End Sub
 
-
-
-
         Public Sub Run()
 
             UserInfo = New UserInfo With {
@@ -188,12 +182,22 @@ Namespace Strategy
         End Sub
 
         Public Sub StopRun()
-
+            bgw.CancelAsync()
+            Do
+                If State = False Then
+                    Exit Do
+                Else
+                    Sleep(1000)
+                End If
+            Loop
         End Sub
 
 
 
+
         Public Sub DoWorkRunStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
+
+            State = True
 
             Dim worker As BackgroundWorker = CType(sender, BackgroundWorker)
 
@@ -229,10 +233,10 @@ Namespace Strategy
                                 '设置基准价
                                 ds.Tables(TableName).Rows(0).Item("basePrice") = upPrice
                                 OrderOpenLong()
-                                Sleep(1000)
+                                Sleep(500)
                                 If ret.FindOrderType("open_short", upPrice) = 0 Then
                                     OrderOpenShort()
-                                    Sleep(1000)
+                                    Sleep(500)
                                 End If
 
                                 Update()
@@ -243,10 +247,10 @@ Namespace Strategy
                                     '设置基准价
                                     ds.Tables(TableName).Rows(0).Item("basePrice") = downPrice
                                     OrderOpenShort()
-                                    Sleep(1000)
+                                    Sleep(500)
                                     If ret.FindOrderType("open_long", downPrice) = 0 Then
                                         OrderOpenLong()
-                                        Sleep(1000)
+                                        Sleep(500)
                                     End If
 
                                     Update()
@@ -275,7 +279,8 @@ Namespace Strategy
 
 
         Public Sub RunComplete(ByVal sender As System.Object, ByVal e As RunWorkerCompletedEventArgs)
-
+            CancelAllOrders()
+            State = False
         End Sub
 
 
@@ -465,8 +470,9 @@ Namespace Strategy
             Return 2
         End Function
 
-
-
+        Protected Overrides Sub Finalize()
+            MyBase.Finalize()
+        End Sub
     End Class
 
 End Namespace
