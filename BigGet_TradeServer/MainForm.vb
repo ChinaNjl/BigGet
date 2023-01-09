@@ -4,6 +4,7 @@
 
 Imports Api
 Imports BigGet_TradeServer.Program.Form.ParentForm.DataGridView
+Imports Google.Protobuf.WellKnownTypes
 
 Public Class MainForm
 
@@ -53,7 +54,8 @@ Public Class MainForm
 
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
-        PublicGetUserStrategy.Update()
+        Dim ts As TimeSpan = DateTime.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0)
+        Debug.Print(Convert.ToInt64(ts.TotalMilliseconds).ToString())
     End Sub
 
     Private Sub 更新数据库ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 更新数据库ToolStripMenuItem.Click

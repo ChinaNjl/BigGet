@@ -146,7 +146,6 @@ Namespace PublicData
                     Next
                 End If
 
-                Debug.Print(BgwCount)
                 Sleep(3000)
             Loop
 

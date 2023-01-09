@@ -6,7 +6,7 @@ Imports System.Threading.Thread
 Imports System.ComponentModel
 Imports Api
 Imports MySql.Data.MySqlClient
-
+Imports System.Text
 
 Namespace Strategy
     Public Class GridContract
@@ -43,7 +43,9 @@ Namespace Strategy
         ''' <returns></returns>
         Private ReadOnly Property priceMethod As Integer
             Get
-                Return CType(ds.Tables(TableName).Rows(0).Item("priceMethod"), Integer)
+                'Return CType(ds.Tables(TableName).Rows(0).Item("priceMethod"), Integer)
+                '默认0
+                Return 0
             End Get
         End Property
 
@@ -113,8 +115,28 @@ Namespace Strategy
             End Get
         End Property
 
+        Private Function sClientId() As String
+
+            Dim str As New StringBuilder
+
+            If Id.Length < 4 Then
+                For i = 1 To 4 - Id.Length
+                    str.Append("0")
+                Next
+            End If
+            str.Append(Id)
+            Dim ts As TimeSpan = DateTime.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0)
+            str.Append(Convert.ToInt64(ts.TotalMilliseconds).ToString())
+
+            Return str.ToString
+        End Function
+
+
         Public bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
 
+
+
+        '方法----------------------------------------------------------
 
 
         Sub New(ByVal _dr As DataRow)
@@ -151,6 +173,9 @@ Namespace Strategy
                 Debug.Print("fijajfdjf")
             End Try
         End Sub
+
+
+
 
         Private Sub Update()
 
@@ -219,47 +244,50 @@ Namespace Strategy
                     Dim ret As Api.UserType.ReplyType.OrderCurrent
                     ret = UserCall.GetOrderCurrent(symbol)
                     If ret.code <> "99999" Then
-                        If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 0 Then
 
-                            OrderOpenShort()
-                            OrderOpenLong()
+                        If ret.code = 0 Then
+                            If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 0 Then
 
-                        Else
-
-                            If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 1 Then
-                                '空单委托成交，多单委托未成交
-
-                                '设置基准价
-                                ds.Tables(TableName).Rows(0).Item("basePrice") = upPrice
+                                OrderOpenShort()
                                 OrderOpenLong()
 
-                                If ret.FindOrderType("open_short", upPrice) = 0 Then
-                                    OrderOpenShort()
-                                End If
-
-                                Update()
                             Else
-                                If ret.FindOrderType("open_short", upPrice) = 1 And ret.FindOrderType("open_long", downPrice) = 0 Then
-                                    '多单委托成交，空单委托未成交
+
+                                If ret.FindOrderType("open_short", upPrice) = 0 And ret.FindOrderType("open_long", downPrice) = 1 Then
+                                    '空单委托成交，多单委托未成交
 
                                     '设置基准价
-                                    ds.Tables(TableName).Rows(0).Item("basePrice") = downPrice
-                                    OrderOpenShort()
-                                    If ret.FindOrderType("open_long", downPrice) = 0 Then
-                                        OrderOpenLong()
+                                    ds.Tables(TableName).Rows(0).Item("basePrice") = upPrice
+                                    OrderOpenLong()
+
+                                    If ret.FindOrderType("open_short", upPrice) = 0 Then
+                                        OrderOpenShort()
                                     End If
 
                                     Update()
+                                Else
+                                    If ret.FindOrderType("open_short", upPrice) = 1 And ret.FindOrderType("open_long", downPrice) = 0 Then
+                                        '多单委托成交，空单委托未成交
 
+                                        '设置基准价
+                                        ds.Tables(TableName).Rows(0).Item("basePrice") = downPrice
+                                        OrderOpenShort()
+                                        If ret.FindOrderType("open_long", downPrice) = 0 Then
+                                            OrderOpenLong()
+                                        End If
+
+                                        Update()
+
+                                    End If
                                 End If
+
                             End If
-
+                        Else
+                            Debug.Print(ret.ToJson)
                         End If
-
 
                     Else
 
-                        Debug.Print(ret.ToJson)
                     End If
 
 
@@ -300,19 +328,14 @@ Namespace Strategy
         Private Function BatchOrders() As Boolean
 
             '创建订单参数
-            Dim Openlong As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
-                .price = downPrice,
-                .size = size,
-                .side = "open_long",
-                .orderType = "limit",
-                .presetTakeProfitPrice = basePrice
-            }
+
             Dim OpenShort As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
                 .price = upPrice,
                 .size = size,
                 .side = "open_short",
                 .orderType = "limit",
-                .presetTakeProfitPrice = basePrice
+                .presetTakeProfitPrice = basePrice,
+                .clientOid = sClientId()
             }
 
             Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
@@ -328,7 +351,14 @@ Namespace Strategy
             ret1 = UserCall.OrderBatchOrders(BatchPrarm)
 
             Sleep(1000)
-
+            Dim Openlong As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+                .price = downPrice,
+                .size = size,
+                .side = "open_long",
+                .orderType = "limit",
+                .presetTakeProfitPrice = basePrice,
+                .clientOid = sClientId()
+            }
             BatchPrarm = New Api.UserType.ParamType.OrderBatchOrders With {
                 .symbol = symbol,
                 .marginCoin = marginCoin
@@ -353,7 +383,6 @@ Namespace Strategy
 
         End Function
 
-
         Private Function OrderOpenLong() As Boolean
 
             '创建订单参数
@@ -362,7 +391,8 @@ Namespace Strategy
                 .size = size,
                 .side = "open_long",
                 .orderType = "limit",
-                .presetTakeProfitPrice = basePrice
+                .presetTakeProfitPrice = basePrice,
+                .clientOid = sClientId()
             }
             Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
             Dim ret As Api.UserType.ReplyType.OrderBatchOrders
@@ -377,10 +407,10 @@ Namespace Strategy
             Try
                 ret = UserCall.OrderBatchOrders(BatchPrarm)
                 If ret.data.orderInfo.Count > 0 Then
-                    Sleep(500)
+                    Sleep(1000)
                     Return True
                 Else
-                    Sleep(500)
+                    Sleep(1000)
                     Return False
                 End If
 
@@ -400,7 +430,8 @@ Namespace Strategy
                 .size = size,
                 .side = "open_short",
                 .orderType = "limit",
-                .presetTakeProfitPrice = basePrice
+                .presetTakeProfitPrice = basePrice,
+                .clientOid = sClientId()
             }
             Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
             Dim ret As Api.UserType.ReplyType.OrderBatchOrders
@@ -414,10 +445,10 @@ Namespace Strategy
             Try
                 ret = UserCall.OrderBatchOrders(BatchPrarm)
                 If ret.data.orderInfo.Count > 0 Then
-                    Sleep(500)
+                    Sleep(1000)
                     Return True
                 Else
-                    Sleep(500)
+                    Sleep(1000)
                     Return False
                 End If
 
