@@ -67,7 +67,7 @@ Public Class ConfObject
 
 
     Public Shared Sql As New SqlObject With {
-        .SqlServer = "156.245.25.149",
+        .SqlServer = "43.154.0.215",
         .SqlUser = "BigGetTrade",
         .SqlPassword = "YKdDCapyzBdJFfe2",
         .SqlPort = "3306",

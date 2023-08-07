@@ -7,7 +7,10 @@ Namespace Program.Form.ParentForm.DataGridView
 
 
             Call PublicGetTickets.OpenTableFromDatabase()
+
+            '将biggetstrategy.publicconf.dttickets绑定到表的数据源
             MainForm.DataGridView1.DataSource = BigGetStrategy.PublicConf.DtTickets.Tables(PublicGetTickets.TableName)
+
             PublicGetTickets.Run()
 
         End Sub

@@ -28,7 +28,7 @@ Public Class SingleOrderPlaceOrderForm
         ComboBox3.DropDownStyle = ComboBoxStyle.DropDownList
         ComboBox4.Items.Add("0.1")
         ComboBox4.Items.Add("0.01")
-        ComboBox4.DropDownStyle = ComboBoxStyle.DropDownList
+        'ComboBox4.DropDownStyle = ComboBoxStyle.DropDownList
 
         ComboBox5.Items.Add("open_long")
         ComboBox5.Items.Add("open_short")
@@ -82,10 +82,17 @@ Public Class clsSingleOrderPlaceOrderForm
                 .size = SingleOrderPlaceOrderForm.ComboBox4.Text,
                 .side = SingleOrderPlaceOrderForm.ComboBox5.Text,
                 .orderType = "market",
-                .presetTakeProfitPrice = Trim(OrderPlaceOrderForm.TextBox1.Text),
-                .presetStopLossPrice = Trim(OrderPlaceOrderForm.TextBox2.Text)
-}
+                .presetTakeProfitPrice = Trim(SingleOrderPlaceOrderForm.TextBox1.Text),
+                .presetStopLossPrice = Trim(SingleOrderPlaceOrderForm.TextBox2.Text)
+            }
+
+
+            Debug.Print(pA.ToJson)
+
             Dim retA As UserType.ReplyType.OrderPlaceOrder = UserTrade.OrderPlaceOrder(pA)
+
+
+            Debug.Print(retA.tojson)
 
             SingleOrderPlaceOrderForm.Text = "单账户补单" & "    进度：" & i & "/" & Count
 

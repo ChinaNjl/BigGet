@@ -28,6 +28,7 @@ Public Class OrderPlaceOrderForm
 
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
         Call clsOrderPlaceOrderForm.BtnOrder()
 
 
@@ -51,6 +52,7 @@ Public Class clsOrderPlaceOrderForm
                 (4, ""),
                 (9, "")
             }
+
         clsTabPage2.clsDataGridView2.ModAllRowItemData(p)
 
 
@@ -81,8 +83,6 @@ Public Class clsOrderPlaceOrderForm
                         .presetStopLossPrice = Trim(OrderPlaceOrderForm.TextBox2.Text)
                     }
                 Dim retA As UserType.ReplyType.OrderPlaceOrder = uAapi.OrderPlaceOrder(pA)
-
-
 
 
                 Dim UserinfoB As New Api.UserInfo With {

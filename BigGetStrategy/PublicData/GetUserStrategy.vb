@@ -8,7 +8,14 @@ Imports Org.BouncyCastle.Math
 
 Namespace PublicData
 
+
+    ''' <summary>
+    ''' 获取用户的策略，并控制启动/关闭
+    ''' </summary>
     Public Class GetUserStrategy
+
+
+
 
         Public Property ds As DataSet
         Public Property sql As New UserType.SqlInfo
@@ -134,7 +141,7 @@ Namespace PublicData
 
                 Dim dt As DataTable = ds.Tables(TableName)
 
-                '先启动，后关闭
+                '把需要运行的策略保存到dataset对象中，然后再读取列表来分别启动
                 If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
                     dt = ds.Tables(TableName)
                     For Each dr As DataRow In dt.Rows
@@ -162,16 +169,18 @@ Namespace PublicData
 
             If _dr.Item("state") = 101 Then
 
+                '策略未运行
                 If _dr.Item("strategytypeid") = 1001 Then
 
                     Dim FindRunStrategy As Boolean = False
                     For Each s As Strategy.GridContract In _bgwList
                         If s.Id = _dr.Item("id") Then
-                            FindRunStrategy = True
+                            FindRunStrategy = True  '存在于列表中
                             Exit For
                         End If
                     Next
 
+                    '不存在于列表中的策略，启动策略
                     If FindRunStrategy = False Then
                         '当策略不存在运行列表中，则启动新策略
                         Dim sobject As New Strategy.GridContract(_dr)
@@ -183,6 +192,7 @@ Namespace PublicData
 
                 Return True
             Else
+                '策略已经运行
                 Return False
             End If
 

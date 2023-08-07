@@ -1,4 +1,7 @@
-﻿
+﻿Imports System.Text.Json
+Imports System.Text.Json.Serialization
+Imports System.Text.Unicode
+
 Namespace UserType.ReplyType
 
     Public Class OrderPlaceOrder
@@ -23,6 +26,16 @@ Namespace UserType.ReplyType
             Public Property clientOid As String
 
         End Class
+
+
+
+        Public Function ToJson() As String
+            Dim s As String = JsonSerializer.Serialize(Me, New JsonSerializerOptions With {
+                                                           .DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                                                           .Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.All)})
+            Return s
+
+        End Function
 
     End Class
 

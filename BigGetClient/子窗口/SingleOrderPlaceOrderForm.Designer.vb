@@ -96,9 +96,9 @@ Partial Class SingleOrderPlaceOrderForm
         Me.Label5.AutoSize = True
         Me.Label5.Location = New System.Drawing.Point(354, 82)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(113, 12)
+        Me.Label5.Size = New System.Drawing.Size(41, 12)
         Me.Label5.TabIndex = 21
-        Me.Label5.Text = "多止损（空止盈）："
+        Me.Label5.Text = "止损："
         '
         'TextBox1
         '
@@ -112,9 +112,9 @@ Partial Class SingleOrderPlaceOrderForm
         Me.Label4.AutoSize = True
         Me.Label4.Location = New System.Drawing.Point(355, 55)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(101, 12)
+        Me.Label4.Size = New System.Drawing.Size(41, 12)
         Me.Label4.TabIndex = 19
-        Me.Label4.Text = "多止盈(空止损)："
+        Me.Label4.Text = "止盈："
         '
         'Label3
         '

@@ -8,7 +8,7 @@ Namespace PublicData
     Public Class GetTickets
 
         'Public Property ds As DataSet
-        Public Property sql As New UserType.SqlInfo
+        Private Property sql As UserType.SqlInfo = PublicConf.Sql
         Public Property userKey As New Api.UserInfo
         Public Property RefDelay As Integer
             Get
@@ -106,7 +106,11 @@ Namespace PublicData
         End Function
 
 
-
+        ''' <summary>
+        ''' 从服务器bitget获取行情数据
+        ''' </summary>
+        ''' <param name="sender"></param>
+        ''' <param name="e"></param>
         Private Sub DoWorkGetTickets(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
 
@@ -138,7 +142,11 @@ Namespace PublicData
 
         End Sub
 
-
+        ''' <summary>
+        ''' 将数据保存到publicconf中的DtTickets对象中
+        ''' </summary>
+        ''' <param name="sender"></param>
+        ''' <param name="e"></param>
         Public Sub ProgressChanged_GetTickeets(ByVal sender As System.Object, ByVal e As ProgressChangedEventArgs)
 
             Dim tmptickets As New List(Of List(Of String))

@@ -1,14 +1,15 @@
-﻿
-
-
-
-Imports System.Threading.Thread
+﻿Imports System.Threading.Thread
 Imports System.ComponentModel
 Imports Api
 Imports MySql.Data.MySqlClient
 Imports System.Text
 
 Namespace Strategy
+    ''' <summary>
+    ''' 网格合约交易
+    ''' </summary>
+
+
     Public Class GridContract
         Public ReadOnly Property Id As String
             Get
@@ -146,7 +147,7 @@ Namespace Strategy
         End Sub
 
         ''' <summary>
-        ''' 通过dataset控件读取数据库contracttable 表
+        ''' 通过dataset控件读取数据库Strategytable 表
         ''' </summary>
         Private Sub OpenTableFromDatabase(id)
 

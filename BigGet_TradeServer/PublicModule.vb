@@ -3,9 +3,9 @@
 Module PublicModule
 
 
-    Public PublicGetContracts As New PublicData.GetContracts
-    Public PublicGetTickets As New PublicData.GetTickets
-    Public PublicGetUserStrategy As New PublicData.GetUserStrategy
+    Public PublicGetContracts As New BigGetStrategy.PublicData.GetContracts
+    Public PublicGetTickets As New BigGetStrategy.PublicData.GetTickets
+    Public Property PublicGetUserStrategy As New BigGetStrategy.PublicData.GetUserStrategy
 
 
     Public Sub StrategyInitialize()
@@ -18,13 +18,13 @@ Module PublicModule
         End With
 
 
-        With PublicGetTickets.sql
-            .SqlPassword = ConfObject.Sql.SqlPassword
-            .SqlPort = ConfObject.Sql.SqlPort
-            .SqlServer = ConfObject.Sql.SqlServer
-            .SqlUser = ConfObject.Sql.SqlUser
-            .Database = ConfObject.Sql.Database
-        End With
+        'With PublicGetTickets.sql
+        '    .SqlPassword = ConfObject.Sql.SqlPassword
+        '    .SqlPort = ConfObject.Sql.SqlPort
+        '    .SqlServer = ConfObject.Sql.SqlServer
+        '    .SqlUser = ConfObject.Sql.SqlUser
+        '    .Database = ConfObject.Sql.Database
+        'End With
 
 
         With PublicGetContracts.userKey
@@ -58,7 +58,7 @@ Module PublicModule
             .Database = ConfObject.Sql.Database
         End With
 
-        With PublicConf.sql
+        With BigGetStrategy.PublicConf.Sql
             .SqlPassword = ConfObject.Sql.SqlPassword
             .SqlPort = ConfObject.Sql.SqlPort
             .SqlServer = ConfObject.Sql.SqlServer

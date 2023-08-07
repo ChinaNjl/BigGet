@@ -21,6 +21,7 @@ Public Class MainForm
         DataGridView1Class.Initialize()
         DataGridView2Class.Initialize()
         DataGridView3Class.Initialize()
+
         Timer1.Enabled = True
         Program.Form.ParentForm.MainFormClass.UploadState = True
     End Sub
@@ -108,6 +109,10 @@ Public Class MainForm
         Else
             PublicGetUserStrategy.Run()
         End If
+    End Sub
+
+    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
+
     End Sub
 End Class
 
