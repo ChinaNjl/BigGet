@@ -24,7 +24,7 @@ Namespace PublicData
         Public ReadOnly Property ColName As String = "id,strategytypeid,state"
 
 
-        Public Property bgwList As New List(Of Strategy.GridContract)
+        Public Property bgwList As New List(Of Object)
         Public ReadOnly Property BgwCount As Integer
             Get
                 Return bgwList.Count
@@ -72,7 +72,7 @@ Namespace PublicData
         End Function
 
         ''' <summary>
-        ''' 通过dataset控件读取数据库contracttable 表
+        ''' 通过dataset控件读取数据库strategytable 表
         ''' </summary>
         Public Function OpenTableFromDatabase() As Boolean
 
@@ -126,6 +126,9 @@ Namespace PublicData
             bgw.CancelAsync()
         End Sub
 
+        ''' <summary>
+        ''' 启动线程：读取用户策略信息表
+        ''' </summary>
         Public Sub Run()
             If bgw.IsBusy = False Then
                 AddHandler bgw.DoWork, AddressOf DoWorkUserStrategy
@@ -146,7 +149,9 @@ Namespace PublicData
                     dt = ds.Tables(TableName)
                     For Each dr As DataRow In dt.Rows
 
+                        '启动策略
                         If StartStrategy(dr, bgwList) = False Then
+                            '启动策略失败，则停止策略
                             StopStrategy(dr, bgwList)
                         End If
 
@@ -165,9 +170,36 @@ Namespace PublicData
         ''' <param name="_dr"></param>
         ''' <param name="_bgwList"></param>
         ''' <returns></returns>
-        Private Function StartStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
+        Private Function StartStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Object)) As Boolean
 
             If _dr.Item("state") = 101 Then
+
+                '....新增策略
+                If _dr.Item("strategytypeid") = 1002 Then
+                    Dim FindRunStrategy As Boolean = False
+                    For Each s As Object In _bgwList
+
+                        If s.Id = _dr.Item("id") Then
+                            FindRunStrategy = True  '存在于列表中
+                            Exit For
+                        End If
+                    Next
+
+                    '不存在于列表中的策略，启动策略
+                    If FindRunStrategy = False Then
+                        '当策略不存在运行列表中，则启动新策略
+                        Dim sobject As New Strategy.TrendContract(_dr)
+                        sobject.Run()
+                        _bgwList.Add(sobject)
+                    End If
+
+
+
+                End If
+
+
+
+
 
                 '策略未运行
                 If _dr.Item("strategytypeid") = 1001 Then
@@ -190,6 +222,9 @@ Namespace PublicData
 
                 End If
 
+
+
+
                 Return True
             Else
                 '策略已经运行
@@ -205,14 +240,14 @@ Namespace PublicData
         ''' <param name="_dr"></param>
         ''' <param name="_bgwList"></param>
         ''' <returns></returns>
-        Private Function StopStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Strategy.GridContract)) As Boolean
+        Private Function StopStrategy(ByVal _dr As DataRow, ByRef _bgwList As List(Of Object)) As Boolean
 
             If _dr.Item("state") = 102 Then
 
                 Dim FindRunStrategy As Boolean = False
                 Dim tmpRunStrategy As Strategy.GridContract = Nothing
 
-                For Each s As Strategy.GridContract In _bgwList
+                For Each s As Object In _bgwList
 
                     If s.Id = _dr.Item("id") Then
                         '暂停指定策略正在运行中

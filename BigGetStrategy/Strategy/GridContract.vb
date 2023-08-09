@@ -11,6 +11,12 @@ Namespace Strategy
 
 
     Public Class GridContract
+
+
+        ''' <summary>
+        ''' 策略编号（在数据库中的标识）
+        ''' </summary>
+        ''' <returns></returns>
         Public ReadOnly Property Id As String
             Get
                 Return ds.Tables(TableName).Rows(0).Item("id")

@@ -3,6 +3,7 @@ Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
 Imports Api
+Imports Org.BouncyCastle.Math.EC
 
 Namespace Strategy
 
@@ -13,8 +14,6 @@ Namespace Strategy
 
         '用户自定义数据
 
-        Public Property userKey As New Api.UserInfo     '用户密钥信息
-
         Structure UserSetInfoObject
             Public symbol As String      '产品id
             Private granularity As String 'k线类别
@@ -24,11 +23,21 @@ Namespace Strategy
 
 
         '内部数据信息
+
+        ''' <summary>
+        ''' 策略编号（在数据库中的标识）
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property Id As String
+            Get
+                Return dsUserInfo.Tables(TableName).Rows(0).Item("id")
+            End Get
+        End Property
         Private Property sql As UserType.SqlInfo = PublicConf.Sql   'sql服务器信息
         Public bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}     '策略线程
-        Public Property State As Boolean = False
+        Public Property State As Boolean = False                '策略运行状态
         Private TableName As String = "strategytable"
-        Private UserInfo As UserInfo
+        Private Property UserInfo As UserInfo
         Private UserCall As UserCall
         Private dsUserInfo As New DataSet
         Private Property myadp As MySqlDataAdapter
@@ -100,7 +109,7 @@ Namespace Strategy
                 If State = False Then
                     Exit Do
                 Else
-                    sleep(1000)
+                    Sleep(1000)
                 End If
             Loop
         End Sub
