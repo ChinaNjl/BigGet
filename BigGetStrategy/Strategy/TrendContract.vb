@@ -12,7 +12,6 @@ Namespace Strategy
     ''' </summary>
     Public Class TrendContract
 
-        '用户自定义数据
 
         Structure UserSetInfoObject
             Public symbol As String      '产品id
@@ -22,7 +21,6 @@ Namespace Strategy
         Private UsrSetInfo As New UserSetInfoObject
 
 
-        '内部数据信息
 
         ''' <summary>
         ''' 策略编号（在数据库中的标识）
