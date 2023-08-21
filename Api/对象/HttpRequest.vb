@@ -102,7 +102,7 @@ Public Class HttpRequest
 
             Return weatherForecast
         Catch ex As Exception
-
+            ' Dim weatherForecast = JsonSerializer.Deserialize(Of List(Of List(Of String)))(Encoding.UTF8.GetBytes(str))
             Debug.Print("HttpRequest.JsonStrToObject错误:{1}"， ex.Message)
             Return Nothing
         End Try

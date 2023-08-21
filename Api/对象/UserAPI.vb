@@ -28,7 +28,10 @@ Public Class UserAPI
     End Property
     Dim _MarketDepth As RestApi.ApiObject
 
-
+    ''' <summary>
+    ''' 全部Ticker行情获取
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property MarketTickers As RestApi.ApiObject
         Get
             If IsNothing(_MarketTickers) = True Then
@@ -38,6 +41,20 @@ Public Class UserAPI
         End Get
     End Property
     Dim _MarketTickers As RestApi.ApiObject
+
+    ''' <summary>
+    ''' 单个Ticker行情获取
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property MarketTicker As RestApi.ApiObject
+        Get
+            If IsNothing(_MarketTicker) = True Then
+                _MarketTicker = New RestApi.ApiObject(UserInfo, RestApi.Market.Ticker)
+            End If
+            Return _MarketTicker
+        End Get
+    End Property
+    Dim _MarketTicker As RestApi.ApiObject
 
 
     Public ReadOnly Property MarketContracts As RestApi.ApiObject
@@ -50,7 +67,22 @@ Public Class UserAPI
     End Property
     Dim _MarketContracts As RestApi.ApiObject
 
+    ''' <summary>
+    ''' 获取k线数据
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property MarketCandles As RestApi.ApiObject
 
+        Get
+
+            If IsNothing(_MarketCandles) = True Then
+                _MarketCandles = New RestApi.ApiObject(UserInfo, RestApi.Market.Candles)
+            End If
+            Return _MarketCandles
+        End Get
+
+    End Property
+    Dim _MarketCandles As RestApi.ApiObject
 
     Public ReadOnly Property OrderPlaceOrder As RestApi.ApiObject
         Get

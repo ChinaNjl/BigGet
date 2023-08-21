@@ -30,6 +30,16 @@ Public Class RestApi
             .Time = 1
         }
 
+        ''' <summary>
+        ''' 单个Ticker行情获取
+        ''' </summary>
+        Public Shared Ticker As New ApiType With {
+            .Method = "GET",
+            .Address = "/api/mix/v1/market/ticker",
+            .Count = 20,
+            .Time = 1
+        }
+
         Public Shared Contracts As New ApiType With {
             .Method = "GET",
             .Address = "/api/mix/v1/market/contracts",
@@ -37,7 +47,12 @@ Public Class RestApi
             .Time = 1
         }
 
-
+        Public Shared Candles As New ApiType With {
+            .Method = "GET",
+            .Address = "/api/mix/v1/market/candles",
+            .Count = 20,
+            .Time = 1
+        }
 
     End Class
 

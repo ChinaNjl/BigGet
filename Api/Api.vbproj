@@ -94,8 +94,10 @@
   <ItemGroup>
     <Compile Include="Type\Param类型\CancelAllOrders.vb" />
     <Compile Include="Type\Param类型\OrderBatchOrders.vb" />
+    <Compile Include="Type\Reply类型\MarketCandles.vb" />
     <Compile Include="Type\Reply类型\MarketContracts.vb" />
     <Compile Include="Type\Reply类型\MarkTickers.vb" />
+    <Compile Include="Type\Reply类型\MarkTicker.vb" />
     <Compile Include="Type\Reply类型\OrderBatchOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCancelAllOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCurrent.vb" />
