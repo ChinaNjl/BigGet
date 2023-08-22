@@ -12,8 +12,8 @@ Public Class MainForm
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Call StrategyInitialize()
 
+        Call Program.Form.ParentForm.MainFormClass.SetBigGetStrategySql()
         Call Program.Form.ParentForm.MainFormClass.Initialize()
         Call Program.Form.ParentForm.MainFormClass.Initialize_ProgramSettings()
 
@@ -42,31 +42,25 @@ Public Class MainForm
 
         Call Program.Form.ParentForm.MainFormClass.Initialize()
 
-
-        Select Case TabControl1.SelectedIndex
-            Case 0
-                'Call Program.Form.ParentForm.DataGridView.DataGridView1Class.StartGetTickets()
-            Case 1
-                Call PublicGetContracts.Run()
-        End Select
-
-
     End Sub
 
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
-        Dim ts As TimeSpan = DateTime.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0)
-        Debug.Print(Convert.ToInt64(ts.TotalMilliseconds).ToString())
+
+
+        'Dim dr As DataRow() = BigGetStrategy.PublicConf.DtContracts.Tables("contracttable").Select("symbol = 'ETHUSDT_UMCBL'"):Debug.Print(dr.Count)
+        Dim dr1 As DataRow = BigGetStrategy.PublicConf.DtContracts.Tables("Contracttable").Rows.Find("ETHUSDT_UMCBL") : Debug.Print(dr1.Item(1))
+
     End Sub
 
     Private Sub 更新数据库ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 更新数据库ToolStripMenuItem.Click
 
-        DataGridView3.DataSource = PublicGetUserStrategy.ds.Tables(PublicGetUserStrategy.TableName)
+
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
 
-        If PublicGetTickets.WorkerIsBusy Then
+        If PublicGetTickers.WorkerIsBusy Then
             Label1.Text = "后台读取行情.....打开"
         Else
             Label1.Text = "后台读取行情.....关闭"
@@ -95,10 +89,10 @@ Public Class MainForm
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-        If PublicGetTickets.WorkerIsBusy Then
-            PublicGetTickets.StopRun()
+        If PublicGetTickers.WorkerIsBusy Then
+            PublicGetTickers.StopRun()
         Else
-            PublicGetTickets.Run()
+            PublicGetTickers.Run()
         End If
 
     End Sub

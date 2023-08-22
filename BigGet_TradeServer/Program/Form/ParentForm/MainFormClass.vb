@@ -14,6 +14,33 @@ Namespace Program.Form.ParentForm
         Public Shared Property UploadState As Boolean = False
 
         ''' <summary>
+        ''' sql服务器信息
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared Property Sql As New SqlObject With {
+            .SqlServer = "43.154.0.215",
+            .SqlUser = "BigGetTrade",
+            .SqlPassword = "YKdDCapyzBdJFfe2",
+            .SqlPort = "3306",
+            .Database = "biggettrade"}
+
+
+        ''' <summary>
+        ''' 设置BigGetStrategy的sql服务器信息
+        ''' </summary>
+        Public Shared Sub SetBigGetStrategySql()
+
+            With BigGetStrategy.PublicConf.Sql
+                .SqlPassword = Sql.SqlPassword
+                .SqlPort = Sql.SqlPort
+                .SqlServer = Sql.SqlServer
+                .SqlUser = Sql.SqlUser
+                .Database = Sql.Database
+            End With
+
+        End Sub
+
+        ''' <summary>
         ''' 窗体及控件绘制
         ''' </summary>
         Public Shared Sub Initialize()

@@ -10,8 +10,8 @@ Namespace PublicData
     Public Class GetContracts
 
         'Public Property ds As DataSet
-        Public Property sql As New UserType.SqlInfo
-        Public Property userKey As New Api.UserInfo
+        Public Property sql As UserType.SqlInfo = PublicConf.Sql
+        Public Property userKey As Api.UserInfo = PublicConf.PublicUserKey
         Private Property myadp As MySqlDataAdapter
 
         Private Shared bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
@@ -34,6 +34,7 @@ Namespace PublicData
             myadp = New MySqlDataAdapter(commandStr, conn)
             Dim commandBuilder As New MySqlCommandBuilder(myadp)
 
+            myadp.MissingSchemaAction = MissingSchemaAction.AddWithKey      '加上默认主键
             myadp.Fill(PublicConf.DtContracts, "contracttable")
 
         End Sub
@@ -76,48 +77,46 @@ Namespace PublicData
             '从bigget上读取合约信息
             Dim ret As Api.UserType.ReplyType.MarketContracts = userCall.GetMarkContracts("umcbl")
 
-            If ret.code = 0 Then
+            If ret.code = "00000" Then
+
+
                 For Each d In ret.data
-
                     Dim dList As New List(Of String) From {
-                        d.symbol,
-                        d.baseCoin,
-                        d.quoteCoin,
-                        d.buyLimitPriceRatio,
-                        d.sellLimitPriceRatio,
-                        d.feeRateUpRatio,
-                        d.makerFeeRate,
-                        d.takerFeeRate,
-                        d.openCostUpRatio,
-                        Strings.Join(d.supportMarginCoins, "|"),
-                        d.minTradeNum,
-                        d.priceEndStep,
-                        d.volumePlace,
-                        d.pricePlace,
-                        d.sizeMultiplier,
-                        d.symbolType
-                    }
-                    Dim isnew As Boolean = False
-                    For Each r As DataRow In PublicConf.DtContracts.Tables("contracttable").Rows
-                        If dList(0) = r(0) Then
-                            r.ItemArray = dList.ToArray
-                            isnew = True
-                            Exit For
-                        End If
-                    Next
+                            d.symbol,
+                            d.baseCoin,
+                            d.quoteCoin,
+                            d.buyLimitPriceRatio,
+                            d.sellLimitPriceRatio,
+                            d.feeRateUpRatio,
+                            d.makerFeeRate,
+                            d.takerFeeRate,
+                            d.openCostUpRatio,
+                            Strings.Join(d.supportMarginCoins, "|"),
+                            d.minTradeNum,
+                            d.priceEndStep,
+                            d.volumePlace,
+                            d.pricePlace,
+                            d.sizeMultiplier,
+                            d.symbolType
+                        }
+                    Dim dr As DataRow = PublicConf.DtContracts.Tables("contracttable").Rows.Find(d.symbol)
+                    If IsNothing(dr) = False Then
 
-                    If isnew = False Then
-
-                        Dim dr As DataRow = PublicConf.DtContracts.Tables("contracttable").NewRow
                         dr.ItemArray = dList.ToArray
-                        PublicConf.DtContracts.Tables("contracttable").Rows.Add(dr)
+                    Else
+                        Dim ndr As DataRow = PublicConf.DtContracts.Tables("contracttable").NewRow
+                        ndr.ItemArray = dList.ToArray
+                        PublicConf.DtContracts.Tables("contracttable").Rows.Add(ndr)
                     End If
 
                 Next
 
                 Update()
-
+            Else
+                Debug.Print("Error:{0}.{1}        {2}", MyBase.ToString, "DoWorkGetContracts", ret.msg)
             End If
+
+
 
 
         End Sub

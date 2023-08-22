@@ -8,6 +8,7 @@ Imports Org.BouncyCastle.Utilities
 Imports System.Security.Principal
 Imports System.Net.Http.Headers
 Imports System.Security.Policy
+Imports BigGetStrategy.PublicData
 
 Namespace Strategy
 
@@ -17,7 +18,7 @@ Namespace Strategy
     Public Class TrendContract
 
 #Region "临时设置"
-        Private maxAndmin As Single = 0.01
+
 #End Region
 
 
@@ -51,9 +52,20 @@ Namespace Strategy
 
 #Region "----------------------产品基本信息-------------------------"
 
+        ''' <summary>
+        ''' 价格围栏
+        ''' </summary>
+        ''' <returns></returns>
+        Private ReadOnly Property max As Single
+            Get
+                If _max = 0 Then
+                    _max = PublicConf.DtContracts.Tables("contracttable").Rows.Find(symbol).Item("buyLimitPriceRatio")
+                End If
 
-
-
+                Return _max
+            End Get
+        End Property
+        Dim _max As Single = 0
 
         ''' <summary>
         ''' 策略编号（在数据库中的标识）
@@ -216,7 +228,7 @@ Namespace Strategy
 
         Sub New(ByVal p_dr As DataRow)
             '从数据库读取策略信息，保存到 dsStrategyInfo 对象中
-            dsStrategyInfo = GetStrategy(p_dr.Item("id"))
+            GetStrategy(p_dr.Item("id"))
 
             '记录对象初始化状态
             If IsNothing(dsStrategyInfo) = False Then
@@ -229,7 +241,7 @@ Namespace Strategy
         ''' </summary>
         ''' <param name="p_id"></param>
         ''' <returns></returns>
-        Private Function GetStrategy(p_id As String) As DataSet
+        Private Function GetStrategy(p_id As String) As Boolean
 
             Dim conn As New MySqlConnection(sql.ConnectStr)
 
@@ -242,19 +254,39 @@ Namespace Strategy
             Dim commandStr As String = "select * from strategytable where id=" & p_id
             myadp = New MySqlDataAdapter(commandStr, conn)
             Dim commandBuilder As New MySqlCommandBuilder(myadp)
+            myadp.MissingSchemaAction = MissingSchemaAction.AddWithKey      '加上默认主键
 
-            Dim tmpDsStrategyInfo As New DataSet
 
             Try
-                myadp.Fill(tmpDsStrategyInfo, "strategytable")   '将读取到的内容存入ds中
-                Return tmpDsStrategyInfo
+                myadp.Fill(dsStrategyInfo, "strategytable")   '将读取到的内容存入ds中
             Catch ex As Exception
                 Debug.Print(“Error：TrendContract/GetStrategy”)
+                Return False
             End Try
 
-            Return Nothing
+            Return True
 
         End Function
+
+
+        ''' <summary>
+        ''' 更新变动的数据
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Update() As Integer
+
+            Try
+                Return myadp.Update(dsStrategyInfo, "strategytable")
+            Catch ex As Exception
+                Debug.Print(ex.Message)
+                Return 0
+            End Try
+
+            Return True
+
+        End Function
+
+
 
 #End Region
 
@@ -312,29 +344,35 @@ Namespace Strategy
             '撤销所有委托
             Dim ret As Boolean = CancelOrders(productType, marginCoin)
 
+
             Dim t As Api.UserType.ReplyType.MarkTicker = UserCall.GetMarkTicker(symbol)
             '从上往下挂单，如果价格超过标的挂单范围改用市价开单
-            FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), t.data.last * 1.01）
+            FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), t.data.last * (1 + max)）
 
             Do
                 '获取价格数据
-                Dim retTicker As Api.UserType.ReplyType.MarkTicker = UserCall.GetMarkTicker(symbol)
+                'Dim retTicker As Api.UserType.ReplyType.MarkTicker = UserCall.GetMarkTicker(symbol)
+
+                Dim drTicker As DataRow = GetTickers.Tickers.Tables("tickertable").Rows.Find(symbol)
+
                 '获取委托数据
                 Dim retCurrent As Api.UserType.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
 
                 Dim maxCurrentPrice As Single = retCurrent.FindMaxPrice     '最大委托价格
+                dsStrategyInfo.Tables("strategytable").Rows.Find("2").Item("basePrice") = maxCurrentPrice + priceChange
+                Update()
+                Dim newPrice As Single = drTicker.Item("last")
                 '当没有委托单的时候将最大委托价格设置为区间下沿
                 If maxCurrentPrice = 0 Then maxCurrentPrice = downLine
 
                 '从下往上补补单
-                MakeUpOrder(retTicker.data.last, maxCurrentPrice, CType(priceChange, Single), upLine, symbol, marginCoin, size)
+                MakeUpOrder(newPrice, maxCurrentPrice, CType(priceChange, Single), upLine, symbol, marginCoin, size)
 
                 Sleep（50）
             Loop
 
 
         End Sub
-
 
         ''' <summary>
         ''' 策略停止，将状态设置为false

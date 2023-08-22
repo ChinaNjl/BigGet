@@ -148,7 +148,7 @@ Partial Class MainForm
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(2)
         Me.TabPage2.Size = New System.Drawing.Size(754, 368)
         Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "TabPage2"
+        Me.TabPage2.Text = "合约信息"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
         'GroupBox2

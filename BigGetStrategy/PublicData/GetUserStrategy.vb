@@ -18,12 +18,9 @@ Namespace PublicData
 
 
         Public Property ds As DataSet
-        Public Property sql As New UserType.SqlInfo
-        Public Property userKey As New Api.UserInfo
+        Public Property sql As UserType.SqlInfo = PublicConf.Sql
         Public ReadOnly Property TableName As String = "strategytable"
         Public ReadOnly Property ColName As String = "id,strategytypeid,state"
-
-
         Public Property bgwList As New List(Of Object)
         Public ReadOnly Property BgwCount As Integer
             Get
