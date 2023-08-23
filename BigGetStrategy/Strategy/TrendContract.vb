@@ -372,7 +372,7 @@ Namespace Strategy
                 If maxCurrentPrice <> 0 Then
                     startPrice = maxCurrentPrice + priceChange
                 Else
-                    startPrice = maxCurrentPrice
+                    startPrice = downLine
                 End If
                 dsStrategyInfo.Tables("strategytable").Rows.Find(2).Item("basePrice") = startPrice
                 Update()
