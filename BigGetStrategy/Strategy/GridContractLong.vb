@@ -15,7 +15,7 @@ Namespace Strategy
     ''' <summary>
     ''' 趋势合约交易
     ''' </summary>
-    Public Class TrendContract
+    Public Class GridContractLong
 
 #Region "临时设置"
 
@@ -336,13 +336,6 @@ Namespace Strategy
         ''' </summary>
         Public Sub StopRun()
             bgw.CancelAsync()
-            'Do
-            '    If State = False Then
-            '        Exit Do
-            '    Else
-            '        Sleep(1000)
-            '    End If
-            'Loop
         End Sub
 
         ''' <summary>
@@ -383,7 +376,6 @@ Namespace Strategy
                 Sleep（50）
             Loop
 
-            State = False
         End Sub
 
         ''' <summary>
@@ -393,6 +385,8 @@ Namespace Strategy
         ''' <param name="e"></param>
         Public Sub RunComplete(ByVal sender As System.Object, ByVal e As RunWorkerCompletedEventArgs)
             State = False
+            dsStrategyInfo.Tables("strategytable").Rows.Find(2).Item("state") = 102
+            Update()
         End Sub
 
 #End Region

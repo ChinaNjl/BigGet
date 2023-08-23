@@ -137,7 +137,7 @@
     <Compile Include="PublicData\GetContracts.vb" />
     <Compile Include="PublicData\GetTickers.vb" />
     <Compile Include="PublicData\GetUserStrategy.vb" />
-    <Compile Include="Strategy\TrendContract.vb" />
+    <Compile Include="Strategy\GridContractLong.vb" />
     <Compile Include="Type\SqlInfo.vb" />
   </ItemGroup>
   <ItemGroup>

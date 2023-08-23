@@ -50,7 +50,7 @@ Public Class MainForm
         Dim lst As New List(Of Integer) From {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 
-        lst.RemoveAll(AddressOf a)
+        lst.Find(AddressOf a)
         Debug.Print(lst.Count)
     End Sub
 
