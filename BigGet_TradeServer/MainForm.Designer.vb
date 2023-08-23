@@ -183,7 +183,7 @@ Partial Class MainForm
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(2)
         Me.TabPage3.Size = New System.Drawing.Size(754, 368)
         Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "TabPage3"
+        Me.TabPage3.Text = "托管策略"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
         'GroupBox3

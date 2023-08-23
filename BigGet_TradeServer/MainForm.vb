@@ -47,11 +47,20 @@ Public Class MainForm
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
 
+        Dim lst As New List(Of Integer) From {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
-        'Dim dr As DataRow() = BigGetStrategy.PublicConf.DtContracts.Tables("contracttable").Select("symbol = 'ETHUSDT_UMCBL'"):Debug.Print(dr.Count)
-        Dim dr1 As DataRow = BigGetStrategy.PublicConf.DtContracts.Tables("Contracttable").Rows.Find("ETHUSDT_UMCBL") : Debug.Print(dr1.Item(1))
 
+        lst.RemoveAll(AddressOf a)
+        Debug.Print(lst.Count)
     End Sub
+
+    Private Function a(b As Integer) As Boolean
+        If b > 5 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
     Private Sub 更新数据库ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 更新数据库ToolStripMenuItem.Click
 

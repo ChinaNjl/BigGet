@@ -45,18 +45,12 @@ Namespace PublicData
 
 
         ''' <summary>
-        ''' 构建sql命令
+        ''' 构造sql
         ''' </summary>
-        ''' <param name="whereStr"></param>
+        ''' <param name="_colName"></param>
+        ''' <param name="_tableName"></param>
+        ''' <param name="_whereStr"></param>
         ''' <returns></returns>
-        Public Function BuildSql(ByVal whereStr As String) As String
-            Return BuildSql(TableName, whereStr)
-        End Function
-
-        Public Function BuildSql(ByVal _tableName As String, ByVal _whereStr As String) As String
-            Return BuildSql(ColName, _tableName, _whereStr)
-        End Function
-
         Public Function BuildSql(ByVal _colName As String, ByVal _tableName As String, ByVal _whereStr As String) As String
 
             Dim sql As String = "select {colName} from {tableName} where {where}"
@@ -73,21 +67,17 @@ Namespace PublicData
         ''' </summary>
         Public Function OpenTableFromDatabase() As Boolean
 
-            Return OpenTableFromDatabase(sql.ConnectStr, BuildSql("state=101 or state=102"), TableName)
+            Return OpenTableFromDatabase(sql.ConnectStr, BuildSql(ColName, TableName， "state=101 or state=102"), TableName)
 
         End Function
 
-        Public Function OpenTableFromDatabase(ByVal comSqlStr As String) As Boolean
-            Return OpenTableFromDatabase(sql.ConnectStr, comSqlStr, TableName)
+        Public Function OpenTableFromDatabase(ByVal _comSqlStr As String) As Boolean
+            Return OpenTableFromDatabase(sql.ConnectStr, _comSqlStr, TableName)
         End Function
 
-        Public Function OpenTableFromDatabase(ByVal comSqlStr As String, ByVal tableName As String) As Boolean
-            Return OpenTableFromDatabase(sql.ConnectStr, comSqlStr, tableName)
-        End Function
+        Public Function OpenTableFromDatabase(ByVal _ConnectStr As String, ByVal _comSqlStr As String, ByVal _tableName As String) As Boolean
 
-        Public Function OpenTableFromDatabase(ByVal ConnectStr As String, ByVal comSqlStr As String, ByVal tableName As String) As Boolean
-
-            Dim conn As New MySqlConnection(ConnectStr)
+            Dim conn As New MySqlConnection(_ConnectStr)
 
             Try
                 conn.Open()
@@ -96,14 +86,14 @@ Namespace PublicData
                 Return False
             End Try
 
-            Dim commandStr As String = comSqlStr.Replace("{0}", tableName)
+            Dim commandStr As String = _comSqlStr.Replace("{0}", _tableName)
             myadp = New MySqlDataAdapter(commandStr, conn)
             Dim commandBuilder As New MySqlCommandBuilder(myadp)
 
             ds = New DataSet
             Try
                 SyncLock ds
-                    myadp.Fill(ds, tableName)   '将读取到的内容存入ds中
+                    myadp.Fill(ds, _tableName)   '将读取到的内容存入ds中
                 End SyncLock
             Catch ex As Exception
                 Debug.Print(ex.Message)
@@ -137,12 +127,11 @@ Namespace PublicData
 
         Public Sub DoWorkUserStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
+            Dim dt As DataTable
             Do
 
-                Dim dt As DataTable = ds.Tables(TableName)
-
                 '把需要运行的策略保存到dataset对象中，然后再读取列表来分别启动
-                If OpenTableFromDatabase(BuildSql("state=101 or state=102")) Then
+                If OpenTableFromDatabase(BuildSql(ColName, TableName， "state=101 or state=102")) Then
                     dt = ds.Tables(TableName)
                     For Each dr As DataRow In dt.Rows
 
@@ -150,16 +139,22 @@ Namespace PublicData
                         If StartStrategy(dr, bgwList) = False Then
                             '启动策略失败，则停止策略
                             StopStrategy(dr, bgwList)
+
                         End If
 
                     Next
-                End If
 
+
+
+                End If
                 Sleep(3000)
+                ClearStrategyList()
             Loop
 
         End Sub
 
+
+#Region "*****************************自定义方法*******************************"
 
         ''' <summary>
         ''' 启动策略
@@ -175,7 +170,6 @@ Namespace PublicData
                 If _dr.Item("strategytypeid") = 1002 Then
                     Dim FindRunStrategy As Boolean = False
                     For Each s As Object In _bgwList
-
                         If s.Id = _dr.Item("id") Then
                             FindRunStrategy = True  '存在于列表中
                             Exit For
@@ -189,8 +183,6 @@ Namespace PublicData
                         sobject.Run()
                         _bgwList.Add(sobject)
                     End If
-
-
 
                 End If
 
@@ -241,25 +233,29 @@ Namespace PublicData
 
             If _dr.Item("state") = 102 Then
 
-                Dim FindRunStrategy As Boolean = False
-                Dim tmpRunStrategy As Strategy.GridContract = Nothing
-
                 For Each s As Object In _bgwList
-
                     If s.Id = _dr.Item("id") Then
                         '暂停指定策略正在运行中
-                        FindRunStrategy = True
                         s.StopRun()
-                        tmpRunStrategy = s
                         Exit For
                     End If
                 Next
 
-                If FindRunStrategy = True Then
-                    _bgwList.Remove(tmpRunStrategy)
+                Return True
+            Else
+                Return False
+            End If
+        End Function
 
-                End If
 
+
+        Private Function ClearStrategyList() As Integer
+
+            Dim ret As Integer = bgwList.RemoveAll(AddressOf FindStrategy)
+            Return ret
+        End Function
+        Private Function FindStrategy(obj As Object) As Boolean
+            If obj.state = False Then
                 Return True
             Else
                 Return False
@@ -284,6 +280,14 @@ Namespace PublicData
 
             Return True
         End Function
+
+
+#End Region
+
+
+
+
+
 
 
     End Class

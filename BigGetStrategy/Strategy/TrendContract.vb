@@ -155,7 +155,7 @@ Namespace Strategy
         ''' 初始挂单价
         ''' </summary>
         ''' <returns></returns>
-        Private ReadOnly Property startPrice As Single
+        Private Property startPrice As Single
             Get
                 If _startPrice >= 0 Then
                     Return _startPrice
@@ -164,6 +164,9 @@ Namespace Strategy
                     Return _startPrice
                 End If
             End Get
+            Set(value As Single)
+                _startPrice = value
+            End Set
         End Property
         Dim _startPrice As Single = -1
 
@@ -214,6 +217,18 @@ Namespace Strategy
             End Get
         End Property
         Dim _productType As String = ""
+
+        ''' <summary>
+        ''' 最新币价
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property Price As Single
+            Get
+                Dim drTicker As DataRow = GetTickers.Tickers.Tables("tickertable").Rows.Find(symbol)
+                Return drTicker.Item("last")
+            End Get
+        End Property
+
 
 #End Region
 
@@ -321,13 +336,13 @@ Namespace Strategy
         ''' </summary>
         Public Sub StopRun()
             bgw.CancelAsync()
-            Do
-                If State = False Then
-                    Exit Do
-                Else
-                    Sleep(1000)
-                End If
-            Loop
+            'Do
+            '    If State = False Then
+            '        Exit Do
+            '    Else
+            '        Sleep(1000)
+            '    End If
+            'Loop
         End Sub
 
         ''' <summary>
@@ -344,34 +359,31 @@ Namespace Strategy
             '撤销所有委托
             Dim ret As Boolean = CancelOrders(productType, marginCoin)
 
-
-            Dim t As Api.UserType.ReplyType.MarkTicker = UserCall.GetMarkTicker(symbol)
-            '从上往下挂单，如果价格超过标的挂单范围改用市价开单
-            FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), t.data.last * (1 + max)）
+            '从上往下挂单，如果价格超过标的挂单范围改用市价开单.返回值为最后一单的价格
+            Dim lastOrderPrice As Single = FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), Price * (1 + max)）
 
             Do
-                '获取价格数据
-                'Dim retTicker As Api.UserType.ReplyType.MarkTicker = UserCall.GetMarkTicker(symbol)
-
-                Dim drTicker As DataRow = GetTickers.Tickers.Tables("tickertable").Rows.Find(symbol)
+                If worker.CancellationPending Then Exit Sub
 
                 '获取委托数据
                 Dim retCurrent As Api.UserType.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
+                Dim maxCurrentPrice As Single = retCurrent.FindMaxPrice     '最大委托价格,没有委托则返回0
 
-                Dim maxCurrentPrice As Single = retCurrent.FindMaxPrice     '最大委托价格
-                dsStrategyInfo.Tables("strategytable").Rows.Find("2").Item("basePrice") = maxCurrentPrice + priceChange
+                If maxCurrentPrice <> 0 Then
+                    startPrice = maxCurrentPrice + priceChange
+                Else
+                    startPrice = maxCurrentPrice
+                End If
+                dsStrategyInfo.Tables("strategytable").Rows.Find(2).Item("basePrice") = startPrice
                 Update()
-                Dim newPrice As Single = drTicker.Item("last")
-                '当没有委托单的时候将最大委托价格设置为区间下沿
-                If maxCurrentPrice = 0 Then maxCurrentPrice = downLine
 
                 '从下往上补补单
-                MakeUpOrder(newPrice, maxCurrentPrice, CType(priceChange, Single), upLine, symbol, marginCoin, size)
+                MakeUpOrder(Price, maxCurrentPrice, CType(priceChange, Single), upLine, downLine, symbol, marginCoin, size)
 
                 Sleep（50）
             Loop
 
-
+            State = False
         End Sub
 
         ''' <summary>
@@ -389,7 +401,7 @@ Namespace Strategy
 #Region "------------------------2 自定义函数-------------------------"
 
         ''' <summary>
-        ''' 初始化委托,返回第一次下单的价格
+        ''' 初始化委托,返回最后一次下单的价格
         ''' </summary>
         ''' <param name="p_startPrice"></param>
         ''' <param name="p_upLine"></param>
@@ -403,38 +415,28 @@ Namespace Strategy
                                         p_downLine As Single,
                                         p_size As String,
                                         p_change As Single,
-                                        p_ticker As Single) As Boolean
-
-            Dim flgFirst As Boolean = False
-            Dim flgFirstPrice As Single
-
-            '检查p_startPrice是否在交易区间内
-            If p_startPrice > p_upLine Or p_startPrice < p_downLine Then Return False
+                                        p_MaxPrice As Single) As Single
 
 
-            '循环下单
             Do
-                '当p_startPrice价格超出区间下线，退出循环
-                p_startPrice = p_startPrice - p_change
-                If p_startPrice < p_downLine Then Exit Do
+                Dim newPrice As Single = p_startPrice - p_change
+                If newPrice >= p_downLine Then
 
-                If flgFirst = False Then
-                    flgFirstPrice = p_startPrice
-                    flgFirst = Not flgFirst
-                End If
-
-                '开始下单
-                If p_startPrice > p_ticker Then
-                    OpenOrder(p_symbol, p_marginCoin, "open_long", p_startPrice.ToString, p_size, "market", (p_startPrice + p_change).ToString)
+                    p_startPrice = newPrice
+                    If p_startPrice > p_MaxPrice Then
+                        OpenOrder(p_symbol, p_marginCoin, "open_long", p_startPrice.ToString, p_size, "market", (p_startPrice + p_change).ToString)
+                        Sleep(1000)
+                    Else
+                        OpenOrder(p_symbol, p_marginCoin, "open_long", p_startPrice.ToString, p_size, "limit", (p_startPrice + p_change).ToString)
+                        Sleep(1000)
+                    End If
                 Else
-                    OpenOrder(p_symbol, p_marginCoin, "open_long", p_startPrice.ToString, p_size, "limit", (p_startPrice + p_change).ToString)
+                    Exit Do
                 End If
-
-
-                Sleep(1000)
             Loop
 
-            Return flgFirstPrice
+
+            Return p_startPrice
 
         End Function
 
@@ -442,18 +444,32 @@ Namespace Strategy
                                      p_maxCurrentPrice As Single,
                                      p_change As Single,
                                      p_upline As Single,
+                                     p_downline As Single,
                                      p_symbol As String,
                                      p_marginCoin As String,
                                      p_size As String) As Boolean
 
-            Do While p_newPrice > p_maxCurrentPrice + p_change * 2 And p_maxCurrentPrice + p_change <= p_upline
+            If p_maxCurrentPrice <> 0 Then
 
-                Dim ret1 As Boolean = OpenOrder(p_symbol, p_marginCoin, "open_long", (p_maxCurrentPrice + p_change).ToString, p_size, "limit", p_maxCurrentPrice + p_change * 2)
-                p_maxCurrentPrice = p_maxCurrentPrice + p_change
-                If ret1 = True Then Sleep(1000)
+                Do While p_newPrice > p_maxCurrentPrice + p_change * 2 And p_maxCurrentPrice + p_change <= p_upline
+                    Dim ret1 As Boolean = OpenOrder(p_symbol, p_marginCoin, "open_long", (p_maxCurrentPrice + p_change).ToString, p_size, "limit", p_maxCurrentPrice + p_change * 2)
+                    p_maxCurrentPrice = p_maxCurrentPrice + p_change
+                    If ret1 = True Then Sleep(1000)
+                Loop
+
+            Else
+
+                p_maxCurrentPrice = p_downline
+
+                Do While p_newPrice > p_maxCurrentPrice + p_change And p_maxCurrentPrice + p_change <= p_upline
+                    Dim ret1 As Boolean = OpenOrder(p_symbol, p_marginCoin, "open_long", (p_maxCurrentPrice + p_change).ToString, p_size, "limit", p_maxCurrentPrice + p_change * 2)
+                    p_maxCurrentPrice = p_maxCurrentPrice + p_change
+                    If ret1 = True Then Sleep(1000)
+                Loop
+
+            End If
 
 
-            Loop
 
             Return True
         End Function
