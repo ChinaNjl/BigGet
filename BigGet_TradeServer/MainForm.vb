@@ -5,6 +5,7 @@
 Imports Api
 Imports BigGet_TradeServer.Program.Form.ParentForm.DataGridView
 Imports Google.Protobuf.WellKnownTypes
+Imports System.Threading.Thread
 
 Public Class MainForm
 
@@ -47,11 +48,8 @@ Public Class MainForm
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
 
-        Dim lst As New List(Of Integer) From {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 
-        lst.Find(AddressOf a)
-        Debug.Print(lst.Count)
     End Sub
 
     Private Function a(b As Integer) As Boolean
@@ -64,16 +62,22 @@ Public Class MainForm
 
     Private Sub 更新数据库ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 更新数据库ToolStripMenuItem.Click
 
+        Dim UtcTime = TimeZoneInfo.ConvertTimeToUtc(Now).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+        Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+        UtcTime = CType(ts.TotalMilliseconds, Int64)
 
+        Sleep(1000)
+
+        Dim UtcTime1 = TimeZoneInfo.ConvertTimeToUtc(Now).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+        ts = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+        UtcTime1 = CType(ts.TotalMilliseconds, Int64)
+
+        Debug.Print(UtcTime1 - UtcTime)
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
 
-        If PublicGetTickers.WorkerIsBusy Then
-            Label1.Text = "后台读取行情.....打开"
-        Else
-            Label1.Text = "后台读取行情.....关闭"
-        End If
+
 
         If PublicGetUserStrategy.WorkerIsBusy Then
             Label2.Text = "后台获取策略.....打开"
@@ -96,15 +100,7 @@ Public Class MainForm
 
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-        If PublicGetTickers.WorkerIsBusy Then
-            PublicGetTickers.StopRun()
-        Else
-            PublicGetTickers.Run()
-        End If
-
-    End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         If PublicGetUserStrategy.WorkerIsBusy Then

@@ -41,8 +41,6 @@ Partial Class MainForm
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Button2 = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -214,8 +212,6 @@ Partial Class MainForm
         Me.TabPage4.Controls.Add(Me.Label3)
         Me.TabPage4.Controls.Add(Me.Label2)
         Me.TabPage4.Controls.Add(Me.Button2)
-        Me.TabPage4.Controls.Add(Me.Button1)
-        Me.TabPage4.Controls.Add(Me.Label1)
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage4.Name = "TabPage4"
@@ -254,26 +250,6 @@ Partial Class MainForm
         Me.Button2.TabIndex = 2
         Me.Button2.Text = "打开/关闭 获取用户策略"
         Me.Button2.UseVisualStyleBackColor = True
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(211, 19)
-        Me.Button1.Margin = New System.Windows.Forms.Padding(2)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(164, 30)
-        Me.Button1.TabIndex = 1
-        Me.Button1.Text = "打开/关闭 获取行情"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(16, 28)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(41, 12)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Label1"
         '
         'Timer1
         '
@@ -326,8 +302,6 @@ Partial Class MainForm
     Friend WithEvents DataGridView3 As DataGridView
     Friend WithEvents Timer1 As Timer
     Friend WithEvents TabPage4 As TabPage
-    Friend WithEvents Label1 As Label
-    Friend WithEvents Button1 As Button
     Friend WithEvents Label2 As Label
     Friend WithEvents Button2 As Button
     Friend WithEvents Label3 As Label

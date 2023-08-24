@@ -7,7 +7,7 @@ Namespace UserType.ReplyType
     Public Class MarketContracts
 
         Public Property code As String
-        Public Property data As DataType()
+        Public Property data As List(Of DataType)
         Public Property msg As String
         Public Property requestTime
             Get

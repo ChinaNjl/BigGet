@@ -101,7 +101,6 @@ Namespace PublicData
                         }
                     Dim dr As DataRow = PublicConf.DtContracts.Tables("contracttable").Rows.Find(d.symbol)
                     If IsNothing(dr) = False Then
-
                         dr.ItemArray = dList.ToArray
                     Else
                         Dim ndr As DataRow = PublicConf.DtContracts.Tables("contracttable").NewRow

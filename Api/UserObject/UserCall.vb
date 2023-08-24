@@ -26,7 +26,7 @@ Public Class UserCall
     Public Function GetMarkDepth(symbol As String, limit As Integer) As UserType.ReplyType.MarkDepth
 
         '创建参数对象
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("symbol", symbol)
@@ -40,7 +40,7 @@ Public Class UserCall
     End Function
 
     Public Function GetMarkTickers(productType As String) As UserType.ReplyType.MarkTickers
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("productType", productType)
@@ -57,7 +57,7 @@ Public Class UserCall
     ''' <param name="symbol"></param>
     ''' <returns></returns>
     Public Function GetMarkTicker(symbol As String) As UserType.ReplyType.MarkTicker
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("symbol", symbol)
@@ -72,7 +72,7 @@ Public Class UserCall
 
     Public Function GetMarkContracts(productType As String) As UserType.ReplyType.MarketContracts
 
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("productType", productType)
@@ -91,7 +91,7 @@ Public Class UserCall
                                     Optional kLineType As String = "market",
                                     Optional limit As String = "100") As UserType.ReplyType.MarketCandles
 
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("symbol", symbol)
@@ -111,9 +111,6 @@ Public Class UserCall
                     .data = UserAPI.MarketCandles.Value(Of List(Of List(Of String)))},
             .msg = ""}
 
-
-
-
         Return ret
 
     End Function
@@ -132,7 +129,7 @@ Public Class UserCall
     Public Function GetAccountAccounts(productType As String) As UserType.ReplyType.AccountAccounts
 
         '创建参数对象
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '写入参数字典
         param.AddParam("productType", productType)
@@ -188,7 +185,7 @@ Public Class UserCall
     ''' <returns></returns>
     Public Function GetOrderCurrent(symbol As String) As UserType.ReplyType.OrderCurrent
 
-        Dim param As New GetRequestParamType(Nothing)
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
 
         '参数写入参数字典
         param.AddParam("symbol", symbol)
@@ -236,7 +233,25 @@ Public Class UserCall
 
 
 
+    Public Function TraceCurrentTrack(symbol As String, productType As String, pageSize As Integer, pageNo As Integer) As UserType.ReplyType.TraceCurrentTrack
 
+        '创建参数对象
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+
+        '写入参数字典
+        param.AddParam("symbol", symbol)
+        param.AddParam("productType", productType)
+        param.AddParam("pageSize", pageSize)
+        param.AddParam("pageNo", pageNo)
+
+
+        UserAPI.TraceCurrentTrack.Param = param
+
+        Dim ret As UserType.ReplyType.TraceCurrentTrack = UserAPI.TraceCurrentTrack.Value(Of UserType.ReplyType.TraceCurrentTrack)
+
+        Return ret
+
+    End Function
 
 
 

@@ -101,14 +101,16 @@
     <Compile Include="Type\Reply类型\OrderBatchOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCancelAllOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCurrent.vb" />
-    <Compile Include="对象\GetRequestParamType.vb" />
+    <Compile Include="Type\Reply类型\TraceCurrentTrack.vb" />
+    <Compile Include="UserObject\ApiObject\ApiObject.vb" />
+    <Compile Include="UserObject\OtherObject\GetRequestParamType.vb" />
     <Compile Include="Type\Param类型\OrderPlaceOrder.vb" />
     <Compile Include="Type\Reply类型\AccountAccounts.vb" />
     <Compile Include="Type\Reply类型\OrderPlaceOrder.vb" />
     <Compile Include="Setting.vb" />
-    <Compile Include="对象\HttpRequest.vb" />
-    <Compile Include="对象\PublicUrlBuilder.vb" />
-    <Compile Include="对象\RestApi.vb" />
+    <Compile Include="UserObject\OtherObject\HttpRequest.vb" />
+    <Compile Include="UserObject\OtherObject\PublicUrlBuilder.vb" />
+    <Compile Include="UserObject\ApiObject\RestApi.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -124,10 +126,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="对象\Signer.vb" />
-    <Compile Include="对象\UserAPI.vb" />
-    <Compile Include="对象\UserCall.vb" />
-    <Compile Include="对象\UserInfo.vb" />
+    <Compile Include="UserObject\OtherObject\Signer.vb" />
+    <Compile Include="UserObject\UserAPI.vb" />
+    <Compile Include="UserObject\UserCall.vb" />
+    <Compile Include="UserObject\UserInfo.vb" />
     <Compile Include="Type\Reply类型\MarkDepth.vb" />
   </ItemGroup>
   <ItemGroup>

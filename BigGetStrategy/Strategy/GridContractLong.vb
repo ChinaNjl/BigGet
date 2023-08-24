@@ -3,11 +3,7 @@ Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
 Imports Api
-Imports Org.BouncyCastle.Math.EC
-Imports Org.BouncyCastle.Utilities
-Imports System.Security.Principal
-Imports System.Net.Http.Headers
-Imports System.Security.Policy
+
 Imports BigGetStrategy.PublicData
 
 Namespace Strategy
@@ -355,6 +351,9 @@ Namespace Strategy
             '从上往下挂单，如果价格超过标的挂单范围改用市价开单.返回值为最后一单的价格
             Dim lastOrderPrice As Single = FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), Price * (1 + max)）
 
+
+            'Dim test = UserCall.TraceCurrentTrack(symbol, productType, 50, 1)
+
             Do
                 If worker.CancellationPending Then Exit Sub
 
@@ -367,13 +366,13 @@ Namespace Strategy
                 Else
                     startPrice = downLine
                 End If
+
                 dsStrategyInfo.Tables("strategytable").Rows.Find(2).Item("basePrice") = startPrice
                 Update()
 
                 '从下往上补补单
                 MakeUpOrder(Price, maxCurrentPrice, CType(priceChange, Single), upLine, downLine, symbol, marginCoin, size)
 
-                Sleep（50）
             Loop
 
         End Sub
@@ -538,6 +537,7 @@ Namespace Strategy
                 .size = _size.ToString,
                 .side = _side.ToString,
                 .orderType = _orderType.ToString,
+                .clientOid = id & "_" & GetUtcNowTimestamp(),
                 .presetTakeProfitPrice = _presetTakeProfitPrice,
                 .presetStopLossPrice = _presetStopLossPrice}
             prarm.orderDataList.Add(order)
