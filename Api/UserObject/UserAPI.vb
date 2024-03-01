@@ -1,4 +1,7 @@
 ﻿
+''' <summary>
+''' BigGetApi封装成对象
+''' </summary>
 Public Class UserAPI
 
     Sub New(_UserInfo As UserInfo)
@@ -57,6 +60,7 @@ Public Class UserAPI
     Dim _MarketTicker As UserObject.ApiObject.ApiObject
 
 
+
     Public ReadOnly Property MarketContracts As UserObject.ApiObject.ApiObject
         Get
             If IsNothing(_MarketContracts) = True Then
@@ -94,6 +98,10 @@ Public Class UserAPI
     End Property
     Dim _OrderPlaceOrder As UserObject.ApiObject.ApiObject
 
+    ''' <summary>
+    ''' 取消所有订单
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property OrderCancelAllOrders As UserObject.ApiObject.ApiObject
         Get
             If IsNothing(_OrderCancelAllOrders) = True Then
@@ -104,6 +112,10 @@ Public Class UserAPI
     End Property
     Dim _OrderCancelAllOrders As UserObject.ApiObject.ApiObject
 
+    ''' <summary>
+    ''' 批量下单
+    ''' </summary>
+    ''' <returns></returns>
     Public ReadOnly Property OrderBatchOrders As UserObject.ApiObject.ApiObject
         Get
             If IsNothing(_OrderBatchOrders) = True Then
@@ -113,6 +125,22 @@ Public Class UserAPI
         End Get
     End Property
     Dim _OrderBatchOrders As UserObject.ApiObject.ApiObject
+
+    ''' <summary>
+    ''' 订单详情
+    ''' </summary>
+    ''' <returns></returns>
+    Public ReadOnly Property OrderDetail As UserObject.ApiObject.ApiObject
+        Get
+            If IsNothing(_OrderDetail) = True Then
+                _OrderDetail = New UserObject.ApiObject.ApiObject(UserInfo, UserObject.ApiObject.RestApi.Order.OrderDetail)
+            End If
+            Return _OrderDetail
+        End Get
+    End Property
+    Dim _OrderDetail As UserObject.ApiObject.ApiObject
+
+
 
     Public ReadOnly Property OrderCurrent As UserObject.ApiObject.ApiObject
         Get

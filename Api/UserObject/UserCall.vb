@@ -198,6 +198,23 @@ Public Class UserCall
 
     End Function
 
+    Public Function GetOrderDetail(symbol As String, orderId As String) As UserType.ReplyType.OrderDetail
+
+        Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+
+        '参数写入参数字典
+        param.AddParam("symbol", symbol)
+        param.AddParam("orderId", orderId)
+
+        UserAPI.OrderDetail.Param = param
+
+        Dim ret As UserType.ReplyType.OrderDetail = UserAPI.OrderDetail.Value(Of UserType.ReplyType.OrderDetail)
+
+        Return ret
+
+    End Function
+
+
 
 
     ''' <summary>

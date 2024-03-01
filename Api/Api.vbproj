@@ -101,6 +101,7 @@
     <Compile Include="Type\Reply类型\OrderBatchOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCancelAllOrders.vb" />
     <Compile Include="Type\Reply类型\OrderCurrent.vb" />
+    <Compile Include="Type\Reply类型\OrderDetail.vb" />
     <Compile Include="Type\Reply类型\TraceCurrentTrack.vb" />
     <Compile Include="UserObject\ApiObject\ApiObject.vb" />
     <Compile Include="UserObject\OtherObject\GetRequestParamType.vb" />

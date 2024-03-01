@@ -11,7 +11,7 @@ Namespace UserType.ReplyType
     Public Class OrderCurrent
 
         Public Property code As String
-        Public Property data As DataType()
+        Public Property data As List(Of DataType)
         Public Property msg As String
         Public Property requestTime
             Get
@@ -275,6 +275,34 @@ Namespace UserType.ReplyType
             Return c
 
         End Function
+
+        ''' <summary>
+        ''' 搜索委托价
+        ''' </summary>
+        ''' <param name="p_Price"></param>
+        ''' <returns></returns>
+        Public Function FindPrice(p_Price As Single) As Boolean
+            _FindPrice = p_Price
+            Dim ret = data.Find(AddressOf BoolPrice)
+
+            Return Not IsNothing(ret)
+        End Function
+        Dim _FindPrice As Single
+
+        Private Function BoolPrice(obj As DataType) As Boolean
+            Return obj.price = _FindPrice
+        End Function
+
+
+
+
+
+
+
+
+
+
+
 
 
         Public Function ToJson() As String

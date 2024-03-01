@@ -48,7 +48,10 @@ Public Class MainForm
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
 
-
+        Dim que As New Queue(Of Integer)
+        que.Enqueue(1)
+        que.Enqueue(2)
+        Debug.Print(que.Last)
 
     End Sub
 
@@ -92,7 +95,6 @@ Public Class MainForm
                 Label3.Text = "后台策略运行.....关闭"
             End If
         End If
-
 
 
 

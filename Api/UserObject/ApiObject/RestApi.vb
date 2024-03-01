@@ -87,7 +87,12 @@ Namespace UserObject.ApiObject
                 .Time = 1
             }
 
-
+            Public Shared OrderDetail As New ApiType With {
+                .Method = "GET",
+                .Address = "/api/mix/v1/order/detail",
+                .Count = 10,
+                .Time = 1
+            }
 
         End Class
 
@@ -99,9 +104,6 @@ Namespace UserObject.ApiObject
                 .Count = 10,
                 .Time = 1
             }
-
-
-
 
         End Class
 

@@ -5,6 +5,8 @@ Imports System.ComponentModel
 Imports Api
 
 Imports BigGetStrategy.PublicData
+Imports System.Data.OleDb
+Imports System.Security.Cryptography
 
 Namespace Strategy
 
@@ -345,33 +347,17 @@ Namespace Strategy
 
             Dim worker As BackgroundWorker = CType(sender, BackgroundWorker)
 
-            '撤销所有委托
-            Dim ret As Boolean = CancelOrders(productType, marginCoin)
-
-            '从上往下挂单，如果价格超过标的挂单范围改用市价开单.返回值为最后一单的价格
-            Dim lastOrderPrice As Single = FistOpenOrders（symbol, marginCoin, startPrice, upLine, downLine, size, CType(priceChange, Single), Price * (1 + max)）
+            '获取本策略的带单数据,并得到最小带单的止盈价
 
 
-            'Dim test = UserCall.TraceCurrentTrack(symbol, productType, 50, 1)
 
             Do
-                If worker.CancellationPending Then Exit Sub
 
-                '获取委托数据
-                Dim retCurrent As Api.UserType.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
-                Dim maxCurrentPrice As Single = retCurrent.FindMaxPrice     '最大委托价格,没有委托则返回0
+                Dim CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack = GetCurrentTrack()
 
-                If maxCurrentPrice <> 0 Then
-                    startPrice = maxCurrentPrice + priceChange
-                Else
-                    startPrice = downLine
-                End If
+                Dim CurrentOrders As Api.UserType.ReplyType.OrderCurrent = GetOrdersCurrent()
 
-                dsStrategyInfo.Tables("strategytable").Rows.Find(2).Item("basePrice") = startPrice
-                Update()
-
-                '从下往上补补单
-                MakeUpOrder(Price, maxCurrentPrice, CType(priceChange, Single), upLine, downLine, symbol, marginCoin, size)
+                OpenOrders(CurrentTrack, CurrentOrders, upLine, downLine, priceChange)
 
             Loop
 
@@ -393,18 +379,97 @@ Namespace Strategy
 
 #Region "------------------------2 自定义函数-------------------------"
 
+
+        Private Function OpenOrders(p_CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack,
+                                    p_CurrentOrders As Api.UserType.ReplyType.OrderCurrent,
+                                    p_upline As Single,
+                                    p_downline As Single,
+                                    p_change As Single) As Boolean
+
+
+            Do
+                Dim ret1 As Boolean = p_CurrentTrack.FindStopProfitPrice(p_upline)
+                Dim newPrice As Single = p_upline - p_change
+                Dim ret2 As Boolean = p_CurrentOrders.FindPrice(newPrice)
+
+
+                If ret1 And ret2 Then
+                Else
+                    '下单
+                    If newPrice > Price * (1 + max) Then
+                        OpenOrder(symbol, marginCoin, "open_long", newPrice, size, "market", (newPrice + p_change).ToString)
+                        Sleep(1000)
+                    Else
+                        OpenOrder(symbol, marginCoin, "open_long", newPrice, size, "limit", (newPrice + p_change).ToString)
+                        Sleep(1000)
+                    End If
+
+
+                End If
+
+                p_upline = newPrice
+            Loop Until p_upline - p_change < p_downline
+
+            Return True
+
+        End Function
+
+
+
+
+        ''' <summary>
+        ''' 搜索本策略的委托。
+        ''' </summary>
+        ''' <returns></returns>
+        Private Function GetOrdersCurrent() As Api.UserType.ReplyType.OrderCurrent
+
+            Dim retCurrent As Api.UserType.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
+
+            Dim ret As Integer = retCurrent.data.RemoveAll(AddressOf FundCurrentOrders)
+
+            Return retCurrent
+
+        End Function
+        Private Function FundCurrentOrders(c As Api.UserType.ReplyType.OrderCurrent.DataType) As Boolean
+            Dim coid As String = c.clientOid
+            Dim arr = coid.Split("_")
+            Return arr(0) <> id
+        End Function
+
+
+        ''' <summary>
+        ''' 获取本策略的带单
+        ''' </summary>
+        ''' <returns></returns>
+        Private Function GetCurrentTrack() As Api.UserType.ReplyType.TraceCurrentTrack
+            Return (FindCurrentTrackForID(UserCall.TraceCurrentTrack(symbol, productType, 50, 1)))
+        End Function
+        Private Function FindCurrentTrackForID(p_CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack) As Api.UserType.ReplyType.TraceCurrentTrack
+
+            Dim ret As Integer = p_CurrentTrack.data.RemoveAll(AddressOf FindCurrentTrack)
+
+            Return p_CurrentTrack
+
+        End Function
+        Private Function FindCurrentTrack(c As Api.UserType.ReplyType.TraceCurrentTrack.Datum) As Boolean
+            Dim oid As String = c.openOrderId
+            Dim coid As String = UserCall.GetOrderDetail(symbol, oid).data.clientOid
+            Dim arr = coid.Split("_")
+            Return arr(0) <> id
+        End Function
+
+
+
         ''' <summary>
         ''' 初始化委托,返回最后一次下单的价格
         ''' </summary>
         ''' <param name="p_startPrice"></param>
-        ''' <param name="p_upLine"></param>
         ''' <param name="p_downLine"></param>
         ''' <param name="p_change"></param>
         ''' <returns></returns>
         Private Function FistOpenOrders(p_symbol As String,
                                         p_marginCoin As String,
                                         p_startPrice As Single,
-                                        p_upLine As Single,
                                         p_downLine As Single,
                                         p_size As String,
                                         p_change As Single,
@@ -604,11 +669,6 @@ Namespace Strategy
 
 
 #End Region
-
-
-
-
-
 
 
 

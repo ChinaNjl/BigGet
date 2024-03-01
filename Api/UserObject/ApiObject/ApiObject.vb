@@ -9,17 +9,9 @@ Namespace UserObject.ApiObject
 
     Public Class ApiObject
 
-        Sub New(_UserInfo As UserInfo, _Api As UserObject.ApiObject.RestApi.ApiType)
-            UserInfo = _UserInfo
-            Api = _Api
-
-        End Sub
-
 
         Private Property UserInfo As UserInfo
         Private Property Api As UserObject.ApiObject.RestApi.ApiType
-
-
 
         Private ReadOnly Property Signer As UserObject.OtherObject.Signer
             Get
@@ -33,6 +25,15 @@ Namespace UserObject.ApiObject
         Dim _Signer As UserObject.OtherObject.Signer
 
         Private HttpRequest As New UserObject.OtherObject.HttpRequest
+
+
+
+        Sub New(_UserInfo As UserInfo, _Api As UserObject.ApiObject.RestApi.ApiType)
+            UserInfo = _UserInfo
+            Api = _Api
+
+        End Sub
+
 
 
         ''' <summary>
@@ -64,6 +65,9 @@ Namespace UserObject.ApiObject
         End Property
         Dim _temp_Param As Object = Nothing
 
+        ''' <summary>
+        ''' 设置头信息
+        ''' </summary>
         Private Sub HttpRequestHeader()
             Dim UtcTime = TimeZoneInfo.ConvertTimeToUtc(Now).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
             Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
@@ -124,6 +128,15 @@ Namespace UserObject.ApiObject
             Dim url As String
 
 
+            '当访问频率过高的时候执行延迟
+            If que.Count = Api.Count Then
+                Dim c As Int64 = que.Last - que.Peek
+                If c <= Api.Time Then
+                    Sleep(Api.Time - c + 10)
+                End If
+            End If
+
+
 
             If Api.Method = "GET" Then
 
@@ -135,9 +148,9 @@ Namespace UserObject.ApiObject
 
 
                 Call HttpRequestHeader()
-                _resualt = HttpRequest.GetData(Of T)(url)
+                resualt = HttpRequest.GetData(Of T)(url)
 
-                Return _resualt
+                Return resualt
 
             End If
 
@@ -146,27 +159,19 @@ Namespace UserObject.ApiObject
                 url = _UrlBuilder.Build()
 
                 Call HttpRequestHeader()
-                _resualt = HttpRequest.PostAsync(Of T)(url, Param.toJson)
+                resualt = HttpRequest.PostAsync(Of T)(url, Param.toJson)
 
-                Return _resualt
+                Return resualt
 
             End If
 
 
 
-            '将访问时间保存到que队列的末尾,控制频率
-            If que.Count < Api.Count - 1 Then
-                Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                que.Enqueue(CType(ts.TotalMilliseconds, Int64))
-            Else
-                Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                que.Enqueue(CType(ts.TotalMilliseconds, Int64))
-
-                If CType(ts.TotalMilliseconds, Int64) - que.Dequeue <= Api.Time Then
-                    Debug.Print("频率控制")
-                    Sleep(delay)
-                End If
-
+            '将访问时间保存到que队列的末尾,超过最大数量，则删除开头的一次记录
+            Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+            que.Enqueue(CType(ts.TotalMilliseconds, Int64))
+            If que.Count > Api.Count Then
+                que.Dequeue()
             End If
 
 

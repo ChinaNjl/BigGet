@@ -25,6 +25,51 @@ Namespace UserType.ReplyType
             Public Property stopLossPrice As Object
         End Class
 
+
+        Public Function FindStopProfitPrice(p_stopProfitPrice As Single) As Boolean
+            _FindStopProfitPrice = p_stopProfitPrice
+            Dim ret = data.Find(AddressOf BoolStopProfitPrice)
+
+            Return Not IsNothing(ret)
+        End Function
+        Dim _FindStopProfitPrice As Single
+
+        Private Function BoolStopProfitPrice(obj As Datum) As Boolean
+            Return obj.stopProfitPrice = _FindStopProfitPrice
+        End Function
+
+
+
+
+        Public Function MinStopProfitPrice() As Single
+
+            If data.Count > 0 Then
+
+                Dim min As Single = 0
+                Dim i As Integer = 1
+                For Each d In data
+                    If i = 1 Then
+                        min = d.stopProfitPrice
+                    Else
+                        If min > d.stopProfitPrice Then
+                            min = d.stopProfitPrice
+                        End If
+                    End If
+                    i = i + 1
+                Next
+
+                Return min
+
+            Else
+                Return 0
+            End If
+
+
+
+        End Function
+
+
+
         Public Function ToJson() As String
             Dim s As String = JsonSerializer.Serialize(Me, New JsonSerializerOptions With {
                                                            .DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
