@@ -11,7 +11,7 @@ Imports System.Security.Cryptography
 Namespace Strategy
 
     ''' <summary>
-    ''' 趋势合约交易
+    ''' 趋势合约交易（多）
     ''' </summary>
     Public Class GridContractLong
 
