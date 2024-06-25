@@ -1,5 +1,5 @@
 ﻿
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
     Public Class AccountAccounts
         Public Property code As String

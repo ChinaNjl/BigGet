@@ -112,8 +112,16 @@ Public Class MainForm
         End If
     End Sub
 
-    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
 
+
+    Private Sub BtnAutoRefresh_TabPage_Click(sender As Object, e As EventArgs) Handles BtnAutoRefresh_TabPage.Click
+        If PublicGetUserStrategy.WorkerIsBusy Then
+            PublicGetUserStrategy.StopRun()
+            BtnAutoRefresh_TabPage.Text = "获取用户策略"
+        Else
+            PublicGetUserStrategy.Run()
+            BtnAutoRefresh_TabPage.Text = "关闭自动获取"
+        End If
     End Sub
 End Class
 

@@ -2,7 +2,7 @@
 
 Imports System.Text.Json
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
     Public Class MarketContracts
 
@@ -41,7 +41,7 @@ Namespace UserType.ReplyType
                 Set(value)
                     Dim jsonArray As JsonElement = value
                     For Each a In jsonArray.EnumerateArray
-                        _supportMarginCoins.add(a.GetString)
+                        _supportMarginCoins.Add(a.GetString)
                     Next
                 End Set
             End Property

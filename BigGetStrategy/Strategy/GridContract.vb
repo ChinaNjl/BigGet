@@ -1,6 +1,5 @@
 ﻿Imports System.Threading.Thread
 Imports System.ComponentModel
-Imports Api
 Imports MySql.Data.MySqlClient
 Imports System.Text
 
@@ -26,8 +25,8 @@ Namespace Strategy
 
 
         Private dr As DataRow
-        Private UserInfo As UserInfo
-        Private UserCall As UserCall
+        Private UserInfo As Api.UserInfo
+        Private UserCall As Api.UserObject.Contract.UserCall
         Private ds As New DataSet
         Private Property myadp As MySqlDataAdapter
 
@@ -196,14 +195,14 @@ Namespace Strategy
 
         Public Sub Run()
 
-            UserInfo = New UserInfo With {
+            UserInfo = New Api.UserInfo With {
                 .ApiKey = ds.Tables(TableName).Rows(0).Item("apikey"),
                 .Secretkey = ds.Tables(TableName).Rows(0).Item("secretkey"),
                 .Passphrase = ds.Tables(TableName).Rows(0).Item("passphrase"),
                 .Host = ds.Tables(TableName).Rows(0).Item("host")
             }
 
-            UserCall = New UserCall(UserInfo)
+            UserCall = New Api.UserObject.Contract.UserCall(UserInfo)
 
             If bgw.IsBusy = False Then
                 AddHandler bgw.DoWork, AddressOf DoWorkRunStrategy
@@ -248,7 +247,7 @@ Namespace Strategy
 
                 Do
 
-                    Dim ret As Api.UserType.ReplyType.OrderCurrent
+                    Dim ret As Api.UserType.Contract.ReplyType.OrderCurrent
                     ret = UserCall.GetOrderCurrent(symbol)
                     If ret.code <> "99999" Then
 
@@ -318,7 +317,7 @@ Namespace Strategy
         Private Function CancelAllOrders() As Boolean
 
             Try
-                Dim ret As Api.UserType.ReplyType.OrderCancelAllOrders = UserCall.OrderCancelAllOrders(productType, marginCoin)
+                Dim ret As Api.UserType.Contract.ReplyType.OrderCancelAllOrders = UserCall.OrderCancelAllOrders(productType, marginCoin)
                 If ret.code <> 0 Then
                     Debug.Print(ret.msg)
                 End If
@@ -336,7 +335,7 @@ Namespace Strategy
 
             '创建订单参数
 
-            Dim OpenShort As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+            Dim OpenShort As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = upPrice,
                 .size = size,
                 .side = "open_short",
@@ -345,12 +344,12 @@ Namespace Strategy
                 .clientOid = sClientId()
             }
 
-            Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
-            Dim ret1 As Api.UserType.ReplyType.OrderBatchOrders
-            Dim ret2 As Api.UserType.ReplyType.OrderBatchOrders
+            Dim BatchPrarm As Api.UserType.Contract.ParamType.OrderBatchOrders
+            Dim ret1 As Api.UserType.Contract.ReplyType.OrderBatchOrders
+            Dim ret2 As Api.UserType.Contract.ReplyType.OrderBatchOrders
 
 
-            BatchPrarm = New Api.UserType.ParamType.OrderBatchOrders With {
+            BatchPrarm = New Api.UserType.Contract.ParamType.OrderBatchOrders With {
                 .symbol = symbol,
                 .marginCoin = marginCoin
             }
@@ -358,7 +357,7 @@ Namespace Strategy
             ret1 = UserCall.OrderBatchOrders(BatchPrarm)
 
             Sleep(1000)
-            Dim Openlong As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+            Dim Openlong As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = downPrice,
                 .size = size,
                 .side = "open_long",
@@ -366,7 +365,7 @@ Namespace Strategy
                 .presetTakeProfitPrice = basePrice,
                 .clientOid = sClientId()
             }
-            BatchPrarm = New Api.UserType.ParamType.OrderBatchOrders With {
+            BatchPrarm = New Api.UserType.Contract.ParamType.OrderBatchOrders With {
                 .symbol = symbol,
                 .marginCoin = marginCoin
             }
@@ -393,7 +392,7 @@ Namespace Strategy
         Private Function OrderOpenLong() As Boolean
 
             '创建订单参数
-            Dim Openlong As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+            Dim Openlong As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = downPrice,
                 .size = size,
                 .side = "open_long",
@@ -401,11 +400,11 @@ Namespace Strategy
                 .presetTakeProfitPrice = basePrice,
                 .clientOid = sClientId()
             }
-            Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
-            Dim ret As Api.UserType.ReplyType.OrderBatchOrders
+            Dim BatchPrarm As Api.UserType.Contract.ParamType.OrderBatchOrders
+            Dim ret As Api.UserType.Contract.ReplyType.OrderBatchOrders
 
 
-            BatchPrarm = New Api.UserType.ParamType.OrderBatchOrders With {
+            BatchPrarm = New Api.UserType.Contract.ParamType.OrderBatchOrders With {
                 .symbol = symbol,
                 .marginCoin = marginCoin
             }
@@ -432,7 +431,7 @@ Namespace Strategy
 
         Private Function OrderOpenShort() As Boolean
             '创建订单参数
-            Dim OpenShort As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+            Dim OpenShort As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = upPrice,
                 .size = size,
                 .side = "open_short",
@@ -440,10 +439,10 @@ Namespace Strategy
                 .presetTakeProfitPrice = basePrice,
                 .clientOid = sClientId()
             }
-            Dim BatchPrarm As Api.UserType.ParamType.OrderBatchOrders
-            Dim ret As Api.UserType.ReplyType.OrderBatchOrders
+            Dim BatchPrarm As Api.UserType.Contract.ParamType.OrderBatchOrders
+            Dim ret As Api.UserType.Contract.ReplyType.OrderBatchOrders
 
-            BatchPrarm = New Api.UserType.ParamType.OrderBatchOrders With {
+            BatchPrarm = New Api.UserType.Contract.ParamType.OrderBatchOrders With {
                 .symbol = symbol,
                 .marginCoin = marginCoin
             }
@@ -477,7 +476,7 @@ Namespace Strategy
         ''' <returns></returns>
         Private Function CheckOrderCurrentState() As Integer
 
-            Dim ret As Api.UserType.ReplyType.OrderCurrent
+            Dim ret As Api.UserType.Contract.ReplyType.OrderCurrent
             Try
                 ret = UserCall.GetOrderCurrent(symbol)
                 If ret.code = 0 Then

@@ -3,7 +3,7 @@
 
 
 
-Namespace UserType.ParamType
+Namespace UserType.Contract.ParamType
     Public Class CancelAllOrders
 
 

@@ -1,7 +1,10 @@
 ﻿
 
-Namespace UserObject.ApiObject
-    Public Class RestApi
+Namespace UserObject.ApiObject.RestApi
+    ''' <summary>
+    ''' 合约api信息
+    ''' </summary>
+    Public Class Contract
 
         Public Class Accounts
 
@@ -96,7 +99,6 @@ Namespace UserObject.ApiObject
 
         End Class
 
-
         Public Class Trace
             Public Shared CurrentTrack As New ApiType With {
                 .Method = "GET",
@@ -157,6 +159,9 @@ Namespace UserObject.ApiObject
         End Class
 
     End Class
+
+
+
 End Namespace
 
 

@@ -13,11 +13,13 @@ Namespace Program.Form.ParentForm.DataGridView
 
 
 
-            '读取用户策略表的信息
+            '读取初始化所有策略信息
             Call PublicGetUserStrategy.OpenTableFromDatabase()
 
             '将用户策略表设置为dgv3的源信息
             MainForm.DataGridView3.DataSource = PublicGetUserStrategy.ds.Tables(PublicGetUserStrategy.TableName)
+
+            '启动策略
             'PublicGetUserStrategy.Run()
 
         End Sub

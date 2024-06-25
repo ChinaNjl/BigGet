@@ -4,7 +4,7 @@
 Namespace UserObject.OtherObject
     Public Class PublicUrlBuilder
 
-        Public Property _Api As UserObject.ApiObject.RestApi.ApiType
+        Public Property _Api As UserObject.ApiObject.RestApi.Contract.ApiType
         ReadOnly _Setting As UserInfo
         Public Property Host As String
 

@@ -87,6 +87,7 @@ Namespace PublicData
                         If dr.Item("state") = 102 Then
                             StopStrategy(dr, bgwList)
                         End If
+
                     Next
 
                 End If
@@ -225,14 +226,14 @@ Namespace PublicData
                 Return False
             End Try
 
-            Dim commandStr As String = _comSqlStr.Replace("{0}", _tableName)
-            myadp = New MySqlDataAdapter(commandStr, conn)
+            'Dim commandStr As String = _comSqlStr.Replace("{0}", _tableName)
+            myadp = New MySqlDataAdapter(_comSqlStr, conn)
             Dim commandBuilder As New MySqlCommandBuilder(myadp)
 
             ds = New DataSet
             Try
                 SyncLock ds
-                    myadp.Fill(ds, _tableName)   '将读取到的内容存入ds中
+                    myadp.Fill(ds, _tableName)   '将读取到的内容存入ds中对应的表
                 End SyncLock
             Catch ex As Exception
                 Debug.Print(ex.Message)

@@ -71,11 +71,11 @@ Namespace PublicData
 
             Dim Worker As BackgroundWorker = CType(sender, BackgroundWorker)
 
-            Dim userCall As New Api.UserCall(userKey)
+            Dim userCall As New Api.UserObject.Contract.UserCall(userKey)
 
 
             '从bigget上读取合约信息
-            Dim ret As Api.UserType.ReplyType.MarketContracts = userCall.GetMarkContracts("umcbl")
+            Dim ret As Api.UserType.Contract.ReplyType.MarketContracts = userCall.GetMarkContracts("umcbl")
 
             If ret.code = "00000" Then
 

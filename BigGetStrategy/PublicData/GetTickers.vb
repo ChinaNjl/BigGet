@@ -5,6 +5,7 @@ Imports System.ComponentModel
 Imports System.Runtime.InteropServices.WindowsRuntime
 Imports System.Runtime.InteropServices
 
+
 Namespace PublicData
     Public Class GetTickers
 
@@ -46,7 +47,7 @@ Namespace PublicData
         Private Sub DoWorkGetTickers(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
             Dim Worker As BackgroundWorker = CType(sender, BackgroundWorker)
-            Dim UserCall As New Api.UserCall(userKey)
+            Dim UserCall As New Api.UserObject.Contract.UserCall(userKey)
 
             Dim count As Integer = 1
 
@@ -54,7 +55,7 @@ Namespace PublicData
                 '线程控制线程退出循环
                 If Worker.CancellationPending Then Exit Do
 
-                Dim ret As Api.UserType.ReplyType.MarkTickers = UserCall.GetMarkTickers("umcbl")
+                Dim ret As Api.UserType.Contract.ReplyType.MarkTickers = UserCall.GetMarkTickers("umcbl")
 
                 '刷新Tickers
                 If ret.code = "00000" Then

@@ -3,7 +3,7 @@
 
 Imports System.Text.Json
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
     Public Class MarketCandles
         Public Property code As String
         Public Property data As DataType

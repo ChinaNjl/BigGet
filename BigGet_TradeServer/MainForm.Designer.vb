@@ -42,6 +42,7 @@ Partial Class MainForm
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.BtnAutoRefresh_TabPage = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
@@ -99,7 +100,7 @@ Partial Class MainForm
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(762, 394)
+        Me.TabControl1.Size = New System.Drawing.Size(918, 523)
         Me.TabControl1.TabIndex = 2
         '
         'TabPage1
@@ -174,12 +175,13 @@ Partial Class MainForm
         '
         'TabPage3
         '
+        Me.TabPage3.Controls.Add(Me.BtnAutoRefresh_TabPage)
         Me.TabPage3.Controls.Add(Me.GroupBox3)
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(2)
-        Me.TabPage3.Size = New System.Drawing.Size(754, 368)
+        Me.TabPage3.Size = New System.Drawing.Size(910, 497)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "托管策略"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -191,7 +193,7 @@ Partial Class MainForm
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox3.Size = New System.Drawing.Size(442, 262)
+        Me.GroupBox3.Size = New System.Drawing.Size(661, 299)
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "GroupBox3"
@@ -255,6 +257,15 @@ Partial Class MainForm
         '
         Me.Timer1.Interval = 1000
         '
+        'BtnAutoRefresh_TabPage
+        '
+        Me.BtnAutoRefresh_TabPage.Location = New System.Drawing.Point(8, 432)
+        Me.BtnAutoRefresh_TabPage.Name = "BtnAutoRefresh_TabPage"
+        Me.BtnAutoRefresh_TabPage.Size = New System.Drawing.Size(126, 47)
+        Me.BtnAutoRefresh_TabPage.TabIndex = 1
+        Me.BtnAutoRefresh_TabPage.Text = "BtnAutoRefresh_TabPage"
+        Me.BtnAutoRefresh_TabPage.UseVisualStyleBackColor = True
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -305,4 +316,5 @@ Partial Class MainForm
     Friend WithEvents Label2 As Label
     Friend WithEvents Button2 As Button
     Friend WithEvents Label3 As Label
+    Friend WithEvents BtnAutoRefresh_TabPage As Button
 End Class

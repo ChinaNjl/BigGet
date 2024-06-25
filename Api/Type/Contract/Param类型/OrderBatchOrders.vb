@@ -1,6 +1,6 @@
 ﻿Imports System.Text.Json
 
-Namespace UserType.ParamType
+Namespace UserType.Contract.ParamType
 
     Public Class OrderBatchOrders
 

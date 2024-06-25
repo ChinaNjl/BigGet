@@ -1,5 +1,5 @@
 ﻿
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
     Public Class MarkTicker
         Public Property code As String
         Public Property msg As String

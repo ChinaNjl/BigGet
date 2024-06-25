@@ -1,14 +1,10 @@
-﻿
-
-
-Imports System.Text.Json
+﻿Imports System.Text.Json
 Imports System.Text.Json.Serialization
 Imports System.Text.Unicode
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
-
-    Public Class OrderCancelAllOrders
+    Public Class OrderPlaceOrder
         Public Property code As String
         Public Property msg As String
         Public Property requestTime
@@ -23,35 +19,14 @@ Namespace UserType.ReplyType
 
         Public Property data As DataType
 
+
         Public Class DataType
 
-            Public Property order_ids
-                Get
-                    Return _order_ids.ToArray
-                End Get
-                Set(value)
-                    Dim jsonArray As JsonElement = value
-                    For Each a In jsonArray.EnumerateArray
-                        _order_ids.Add(a.GetString)
-                    Next
-
-                End Set
-            End Property
-            Dim _order_ids As New List(Of String)
-
-            Public Property fail_infos As fail_infosType()
-
-
-
-            Public Class fail_infosType
-
-                Public Property order_id As String
-                Public Property err_code As String
-                Public Property err_msg As String
-
-            End Class
+            Public Property orderId As String
+            Public Property clientOid As String
 
         End Class
+
 
 
         Public Function ToJson() As String
@@ -62,8 +37,8 @@ Namespace UserType.ReplyType
 
         End Function
 
-
     End Class
+
 
 
 End Namespace

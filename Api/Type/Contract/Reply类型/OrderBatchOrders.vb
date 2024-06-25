@@ -6,7 +6,7 @@ Imports System.Text.Json
 Imports System.Text.Json.Serialization
 Imports System.Text.Unicode
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
     Public Class OrderBatchOrders
 

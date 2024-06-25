@@ -3,7 +3,7 @@
 Imports System.Text.Json
 
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
     Public Class MarkDepth
 

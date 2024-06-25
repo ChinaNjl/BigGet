@@ -4,7 +4,7 @@
 Imports System.Text.Json
 Imports System.Threading
 
-Namespace UserType.ParamType
+Namespace UserType.Contract.ParamType
 
     Public Class OrderPlaceOrder
 

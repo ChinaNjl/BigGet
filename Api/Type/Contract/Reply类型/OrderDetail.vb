@@ -2,7 +2,7 @@
 Imports System.Text.Json.Serialization
 Imports System.Text.Unicode
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
     Public Class OrderDetail
         Public Property code As String

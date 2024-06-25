@@ -2,7 +2,6 @@
 Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
-Imports Api
 
 Imports BigGetStrategy.PublicData
 Imports System.Data.OleDb
@@ -37,9 +36,9 @@ Namespace Strategy
 
         Public bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}     '策略线程
 
-        Private Property UserInfo As UserInfo
+        Private Property UserInfo As Api.UserInfo
 
-        Private UserCall As UserCall
+        Private UserCall As Api.UserObject.Contract.UserCall
 
         Private Property dsStrategyInfo As New DataSet
 
@@ -313,13 +312,13 @@ Namespace Strategy
         Public Sub Run()
 
             '创建api对象
-            UserInfo = New UserInfo With {
+            UserInfo = New Api.UserInfo With {
                 .ApiKey = dsStrategyInfo.Tables("strategytable").Rows(0).Item("apikey"),
                 .Secretkey = dsStrategyInfo.Tables("strategytable").Rows(0).Item("secretkey"),
                 .Passphrase = dsStrategyInfo.Tables("strategytable").Rows(0).Item("passphrase"),
                 .Host = dsStrategyInfo.Tables("strategytable").Rows(0).Item("host")
             }
-            UserCall = New UserCall(UserInfo)
+            UserCall = New Api.UserObject.Contract.UserCall(UserInfo)
 
             '启动策略
             If bgw.IsBusy = False Then
@@ -353,9 +352,9 @@ Namespace Strategy
 
             Do
 
-                Dim CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack = GetCurrentTrack()
+                Dim CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack = GetCurrentTrack()
 
-                Dim CurrentOrders As Api.UserType.ReplyType.OrderCurrent = GetOrdersCurrent()
+                Dim CurrentOrders As Api.UserType.Contract.ReplyType.OrderCurrent = GetOrdersCurrent()
 
                 OpenOrders(CurrentTrack, CurrentOrders, upLine, downLine, priceChange)
 
@@ -380,8 +379,8 @@ Namespace Strategy
 #Region "------------------------2 自定义函数-------------------------"
 
 
-        Private Function OpenOrders(p_CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack,
-                                    p_CurrentOrders As Api.UserType.ReplyType.OrderCurrent,
+        Private Function OpenOrders(p_CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack,
+                                    p_CurrentOrders As Api.UserType.Contract.ReplyType.OrderCurrent,
                                     p_upline As Single,
                                     p_downline As Single,
                                     p_change As Single) As Boolean
@@ -421,16 +420,16 @@ Namespace Strategy
         ''' 搜索本策略的委托。
         ''' </summary>
         ''' <returns></returns>
-        Private Function GetOrdersCurrent() As Api.UserType.ReplyType.OrderCurrent
+        Private Function GetOrdersCurrent() As Api.UserType.Contract.ReplyType.OrderCurrent
 
-            Dim retCurrent As Api.UserType.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
+            Dim retCurrent As Api.UserType.Contract.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
 
             Dim ret As Integer = retCurrent.data.RemoveAll(AddressOf FundCurrentOrders)
 
             Return retCurrent
 
         End Function
-        Private Function FundCurrentOrders(c As Api.UserType.ReplyType.OrderCurrent.DataType) As Boolean
+        Private Function FundCurrentOrders(c As Api.UserType.Contract.ReplyType.OrderCurrent.DataType) As Boolean
             Dim coid As String = c.clientOid
             Dim arr = coid.Split("_")
             Return arr(0) <> id
@@ -441,17 +440,17 @@ Namespace Strategy
         ''' 获取本策略的带单
         ''' </summary>
         ''' <returns></returns>
-        Private Function GetCurrentTrack() As Api.UserType.ReplyType.TraceCurrentTrack
+        Private Function GetCurrentTrack() As Api.UserType.Contract.ReplyType.TraceCurrentTrack
             Return (FindCurrentTrackForID(UserCall.TraceCurrentTrack(symbol, productType, 50, 1)))
         End Function
-        Private Function FindCurrentTrackForID(p_CurrentTrack As Api.UserType.ReplyType.TraceCurrentTrack) As Api.UserType.ReplyType.TraceCurrentTrack
+        Private Function FindCurrentTrackForID(p_CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack) As Api.UserType.Contract.ReplyType.TraceCurrentTrack
 
             Dim ret As Integer = p_CurrentTrack.data.RemoveAll(AddressOf FindCurrentTrack)
 
             Return p_CurrentTrack
 
         End Function
-        Private Function FindCurrentTrack(c As Api.UserType.ReplyType.TraceCurrentTrack.Datum) As Boolean
+        Private Function FindCurrentTrack(c As Api.UserType.Contract.ReplyType.TraceCurrentTrack.Datum) As Boolean
             Dim oid As String = c.openOrderId
             Dim coid As String = UserCall.GetOrderDetail(symbol, oid).data.clientOid
             Dim arr = coid.Split("_")
@@ -556,7 +555,7 @@ Namespace Strategy
                                       p_marginCoin As String) As Boolean
 
             Try
-                Dim ret As Api.UserType.ReplyType.OrderCancelAllOrders = UserCall.OrderCancelAllOrders(p_productType, p_marginCoin)
+                Dim ret As Api.UserType.Contract.ReplyType.OrderCancelAllOrders = UserCall.OrderCancelAllOrders(p_productType, p_marginCoin)
                 If ret.code = "00000" Then
                     Return True
                 Else
@@ -594,10 +593,10 @@ Namespace Strategy
                                    Optional _presetStopLossPrice As String = "") As Boolean
 
             '创建和设置批量下单参数，
-            Dim prarm As New Api.UserType.ParamType.OrderBatchOrders With {
+            Dim prarm As New Api.UserType.Contract.ParamType.OrderBatchOrders With {
                 .symbol = _symbol,
                 .marginCoin = _marginCoin}
-            Dim order As New Api.UserType.ParamType.OrderBatchOrders.orderData With {
+            Dim order As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = _price.ToString,
                 .size = _size.ToString,
                 .side = _side.ToString,
@@ -610,7 +609,7 @@ Namespace Strategy
             '下单和返回结果
             Try
 
-                Dim ret As Api.UserType.ReplyType.OrderBatchOrders = UserCall.OrderBatchOrders(prarm)
+                Dim ret As Api.UserType.Contract.ReplyType.OrderBatchOrders = UserCall.OrderBatchOrders(prarm)
                 Debug.Print(ret.ToJson)
                 If ret.data.orderInfo.Count > 0 Then
                     Return True
@@ -643,7 +642,7 @@ Namespace Strategy
                                   _side As String) As Boolean
 
             '创建反手参数对象，并设置参数
-            Dim prarm As New Api.UserType.ParamType.OrderPlaceOrder With {
+            Dim prarm As New Api.UserType.Contract.ParamType.OrderPlaceOrder With {
                 .symbol = _symbol,
                 .marginCoin = _marginCoin,
                 .size = _size,
@@ -651,7 +650,7 @@ Namespace Strategy
                 .orderType = "market"}
 
 
-            Dim ret As Api.UserType.ReplyType.OrderPlaceOrder = UserCall.OrderPlaceOrder(prarm)
+            Dim ret As Api.UserType.Contract.ReplyType.OrderPlaceOrder = UserCall.OrderPlaceOrder(prarm)
             Debug.Print(ret.ToJson)
             If ret.code = "00000" Then
                 Return True

@@ -1,7 +1,7 @@
 ﻿
 
 
-Namespace UserType.ReplyType
+Namespace UserType.Contract.ReplyType
 
 
     Public Class MarkTickers

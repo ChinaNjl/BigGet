@@ -11,7 +11,7 @@ Namespace UserObject.ApiObject
 
 
         Private Property UserInfo As UserInfo
-        Private Property Api As UserObject.ApiObject.RestApi.ApiType
+        Private Property Api As UserObject.ApiObject.RestApi.Contract.ApiType
 
         Private ReadOnly Property Signer As UserObject.OtherObject.Signer
             Get
@@ -28,7 +28,7 @@ Namespace UserObject.ApiObject
 
 
 
-        Sub New(_UserInfo As UserInfo, _Api As UserObject.ApiObject.RestApi.ApiType)
+        Sub New(_UserInfo As UserInfo, _Api As UserObject.ApiObject.RestApi.Contract.ApiType)
             UserInfo = _UserInfo
             Api = _Api
 

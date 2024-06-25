@@ -92,26 +92,27 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Type\Param类型\CancelAllOrders.vb" />
-    <Compile Include="Type\Param类型\OrderBatchOrders.vb" />
-    <Compile Include="Type\Reply类型\MarketCandles.vb" />
-    <Compile Include="Type\Reply类型\MarketContracts.vb" />
-    <Compile Include="Type\Reply类型\MarkTickers.vb" />
-    <Compile Include="Type\Reply类型\MarkTicker.vb" />
-    <Compile Include="Type\Reply类型\OrderBatchOrders.vb" />
-    <Compile Include="Type\Reply类型\OrderCancelAllOrders.vb" />
-    <Compile Include="Type\Reply类型\OrderCurrent.vb" />
-    <Compile Include="Type\Reply类型\OrderDetail.vb" />
-    <Compile Include="Type\Reply类型\TraceCurrentTrack.vb" />
+    <Compile Include="Type\Contract\Param类型\CancelAllOrders.vb" />
+    <Compile Include="Type\Contract\Param类型\OrderBatchOrders.vb" />
+    <Compile Include="Type\Contract\Reply类型\MarketCandles.vb" />
+    <Compile Include="Type\Contract\Reply类型\MarketContracts.vb" />
+    <Compile Include="Type\Contract\Reply类型\MarkTickers.vb" />
+    <Compile Include="Type\Contract\Reply类型\MarkTicker.vb" />
+    <Compile Include="Type\Contract\Reply类型\OrderBatchOrders.vb" />
+    <Compile Include="Type\Contract\Reply类型\OrderCancelAllOrders.vb" />
+    <Compile Include="Type\Contract\Reply类型\OrderCurrent.vb" />
+    <Compile Include="Type\Contract\Reply类型\OrderDetail.vb" />
+    <Compile Include="Type\Contract\Reply类型\TraceCurrentTrack.vb" />
     <Compile Include="UserObject\ApiObject\ApiObject.vb" />
+    <Compile Include="UserObject\ApiObject\RestApi\Spot.vb" />
     <Compile Include="UserObject\OtherObject\GetRequestParamType.vb" />
-    <Compile Include="Type\Param类型\OrderPlaceOrder.vb" />
-    <Compile Include="Type\Reply类型\AccountAccounts.vb" />
-    <Compile Include="Type\Reply类型\OrderPlaceOrder.vb" />
+    <Compile Include="Type\Contract\Param类型\OrderPlaceOrder.vb" />
+    <Compile Include="Type\Contract\Reply类型\AccountAccounts.vb" />
+    <Compile Include="Type\Contract\Reply类型\OrderPlaceOrder.vb" />
     <Compile Include="Setting.vb" />
     <Compile Include="UserObject\OtherObject\HttpRequest.vb" />
     <Compile Include="UserObject\OtherObject\PublicUrlBuilder.vb" />
-    <Compile Include="UserObject\ApiObject\RestApi.vb" />
+    <Compile Include="UserObject\ApiObject\RestApi\Contract.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -128,10 +129,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="UserObject\OtherObject\Signer.vb" />
-    <Compile Include="UserObject\UserAPI.vb" />
-    <Compile Include="UserObject\UserCall.vb" />
+    <Compile Include="UserObject\Contract\UserAPI.vb" />
+    <Compile Include="UserObject\Contract\UserCall.vb" />
     <Compile Include="UserObject\UserInfo.vb" />
-    <Compile Include="Type\Reply类型\MarkDepth.vb" />
+    <Compile Include="Type\Contract\Reply类型\MarkDepth.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -153,6 +154,10 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Type\Spot\" />
+    <Folder Include="UserObject\Spot\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
