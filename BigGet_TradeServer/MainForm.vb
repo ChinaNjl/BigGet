@@ -1,23 +1,15 @@
-﻿
-
-
-
-Imports Api
+﻿Imports Api
 Imports BigGet_TradeServer.Program.Form.ParentForm.DataGridView
 Imports Google.Protobuf.WellKnownTypes
 Imports System.Threading.Thread
 
 Public Class MainForm
 
-
-
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
 
         Call Program.Form.ParentForm.MainFormClass.SetBigGetStrategySql()
         Call Program.Form.ParentForm.MainFormClass.Initialize()
         Call Program.Form.ParentForm.MainFormClass.Initialize_ProgramSettings()
-
 
         DataGridView1Class.Initialize()
         DataGridView2Class.Initialize()
@@ -44,7 +36,6 @@ Public Class MainForm
         Call Program.Form.ParentForm.MainFormClass.Initialize()
 
     End Sub
-
 
     Private Sub 测试ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 测试ToolStripMenuItem.Click
 
@@ -80,8 +71,6 @@ Public Class MainForm
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
 
-
-
         If PublicGetUserStrategy.WorkerIsBusy Then
             Label2.Text = "后台获取策略.....打开"
         Else
@@ -96,13 +85,7 @@ Public Class MainForm
             End If
         End If
 
-
-
-
-
     End Sub
-
-
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         If PublicGetUserStrategy.WorkerIsBusy Then
@@ -111,8 +94,6 @@ Public Class MainForm
             PublicGetUserStrategy.Run()
         End If
     End Sub
-
-
 
     Private Sub BtnAutoRefresh_TabPage_Click(sender As Object, e As EventArgs) Handles BtnAutoRefresh_TabPage.Click
         If PublicGetUserStrategy.WorkerIsBusy Then
@@ -123,13 +104,5 @@ Public Class MainForm
             BtnAutoRefresh_TabPage.Text = "关闭自动获取"
         End If
     End Sub
+
 End Class
-
-
-
-
-
-
-
-
-

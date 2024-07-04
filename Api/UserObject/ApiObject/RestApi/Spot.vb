@@ -1,12 +1,7 @@
-﻿
-
-
-
-Namespace UserObject.ApiObject.RestApi
+﻿Namespace UserObject.ApiObject.RestApi
 
     Public Class Spot
 
     End Class
-
 
 End Namespace

@@ -1,15 +1,9 @@
-﻿
-
-
-Imports System.Reflection
+﻿Imports System.Reflection
 Imports System.Text.Json
 Imports System.Threading
 
-
-
-
-
 Namespace UserObject.Contract
+
     ''' <summary>
     ''' 用户调用api对象
     ''' </summary>
@@ -20,9 +14,6 @@ Namespace UserObject.Contract
         End Sub
 
         Private UserAPI As UserAPI
-
-
-
 
 #Region "行情接口"
 
@@ -77,8 +68,6 @@ Namespace UserObject.Contract
             Return ret
         End Function
 
-
-
         Public Function GetMarkContracts(productType As String) As UserType.Contract.ReplyType.MarketContracts
 
             Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
@@ -111,9 +100,6 @@ Namespace UserObject.Contract
             param.AddParam("limit", limit)
             UserAPI.MarketCandles.Param = param
 
-            '48746505
-
-
             Dim ret As New UserType.Contract.ReplyType.MarketCandles With {
                 .code = "0",
                 .data = New Api.UserType.Contract.ReplyType.MarketCandles.DataType With {
@@ -124,12 +110,10 @@ Namespace UserObject.Contract
 
         End Function
 
-
-
 #End Region
 
-
 #Region "账户接口"
+
         ''' <summary>
         ''' 用户信息
         ''' </summary>
@@ -150,9 +134,8 @@ Namespace UserObject.Contract
             Return ret
 
         End Function
+
 #End Region
-
-
 
 #Region "交易接口"
 
@@ -185,7 +168,6 @@ Namespace UserObject.Contract
             Return ret
 
         End Function
-
 
         ''' <summary>
         ''' 获取当前委托
@@ -223,9 +205,6 @@ Namespace UserObject.Contract
 
         End Function
 
-
-
-
         ''' <summary>
         ''' 撤销所有委托
         ''' </summary>
@@ -243,21 +222,12 @@ Namespace UserObject.Contract
 
             Dim ret As UserType.Contract.ReplyType.OrderCancelAllOrders = UserAPI.OrderCancelAllOrders.Value(Of UserType.Contract.ReplyType.OrderCancelAllOrders)
 
-
             If ret.code <> 0 Then Debug.Print(ret.msg)
 
             Return ret
         End Function
 
-
-
-
-
-
-
 #End Region
-
-
 
         Public Function TraceCurrentTrack(symbol As String, productType As String, pageSize As Integer, pageNo As Integer) As UserType.Contract.ReplyType.TraceCurrentTrack
 
@@ -270,7 +240,6 @@ Namespace UserObject.Contract
             param.AddParam("pageSize", pageSize)
             param.AddParam("pageNo", pageNo)
 
-
             UserAPI.TraceCurrentTrack.Param = param
 
             Dim ret As UserType.Contract.ReplyType.TraceCurrentTrack = UserAPI.TraceCurrentTrack.Value(Of UserType.Contract.ReplyType.TraceCurrentTrack)
@@ -279,17 +248,6 @@ Namespace UserObject.Contract
 
         End Function
 
-
-
-
-
-
-
-
-
-
     End Class
+
 End Namespace
-
-
-

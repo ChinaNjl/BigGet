@@ -1,5 +1,4 @@
-﻿
-''' <summary>
+﻿''' <summary>
 ''' 用户信息对象
 ''' </summary>
 Public Class UserInfo
