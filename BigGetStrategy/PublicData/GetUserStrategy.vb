@@ -1,27 +1,25 @@
-﻿
-
-
+﻿Imports System.ComponentModel
 Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
-Imports System.ComponentModel
-Imports Org.BouncyCastle.Math
 
 Namespace PublicData
-
 
     ''' <summary>
     ''' 获取用户的策略，并控制启动/关闭
     ''' </summary>
     Public Class GetUserStrategy
 
-
-
+#Region "变量和对象"
 
         Public Property ds As DataSet
         Public Property sql As UserType.SqlInfo = PublicConf.Sql
         Public ReadOnly Property TableName As String = "strategytable"
         Public ReadOnly Property ColName As String = "id,strategytypeid,state"
         Public Property bgwList As New List(Of Object)
+
+        Private myadp As MySqlDataAdapter
+        Private bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
+
         Public ReadOnly Property BgwCount As Integer
             Get
                 Return bgwList.Count
@@ -38,12 +36,9 @@ Namespace PublicData
             End Get
         End Property
 
+#End Region
 
-        Private myadp As MySqlDataAdapter
-        Private bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
-
-
-
+#Region "公共方法"
 
         ''' <summary>
         ''' 停止后台线程
@@ -62,8 +57,6 @@ Namespace PublicData
                 bgw.RunWorkerAsync()
             End If
         End Sub
-
-
 
         ''' <summary>
         ''' 后台过程，用于启动停止策略
@@ -97,79 +90,11 @@ Namespace PublicData
 
         End Sub
 
-
-#Region "*****************************自定义方法*******************************"
-
-        ''' <summary>
-        ''' 启动策略
-        ''' </summary>
-        ''' <param name="p_dr"></param>
-        ''' <param name="p_bgwList"></param>
-        ''' <returns></returns>
-        Private Function StartStrategy(ByVal p_dr As DataRow, ByRef p_bgwList As List(Of Object)) As Boolean
-
-            '当策略不存在运行列表中，启动策略
-            _idFindStrategy1 = p_dr.Item("id")
-            If IsNothing(p_bgwList.Find(AddressOf FindStrategy1)) = True Then
-
-
-                Dim sobject As Object = Nothing
-                Select Case p_dr.Item("strategytypeid")
-                    Case 1002
-                        sobject = New Strategy.GridContractLong(p_dr)
-                    Case 1001
-                        sobject = New Strategy.GridContract(p_dr)
-                    Case Else
-                End Select
-
-                sobject.Run()
-                p_bgwList.Add(sobject)
-
-            End If
-
-            Return True
-
-        End Function
-
-
-
-        ''' <summary>
-        ''' 停止策略
-        ''' </summary>
-        ''' <param name="p_dr"></param>
-        ''' <param name="p_bgwList"></param>
-        ''' <returns></returns>
-        Private Function StopStrategy(ByVal p_dr As DataRow, ByRef p_bgwList As List(Of Object)) As Boolean
-
-            _idFindStrategy1 = p_dr.Item("id")
-            If IsNothing(p_bgwList.Find(AddressOf FindStrategy1)) = False Then
-
-                p_bgwList.Find(AddressOf FindStrategy1).StopRun()
-
-            End If
-
-            Return True
-
-        End Function
-
-
-        ''' <summary>
-        ''' 从列表中清除暂停的策略
-        ''' </summary>
-        ''' <returns></returns>
-        Private Function ClearStrategyList() As Integer
-
-            Dim ret As Integer = bgwList.RemoveAll(AddressOf FindStrategy)
-            Return ret
-        End Function
-
-
         ''' <summary>
         ''' 更新变动的数据
         ''' </summary>
         ''' <returns></returns>
         Public Function Update() As Boolean
-
 
             Try
                 myadp.Update(ds, TableName)
@@ -178,11 +103,8 @@ Namespace PublicData
                 Return False
             End Try
 
-
             Return True
         End Function
-
-
 
         ''' <summary>
         ''' 构造sql
@@ -244,8 +166,72 @@ Namespace PublicData
 
         End Function
 
+#End Region
 
+#Region "内部方法"
 
+        ''' <summary>
+        ''' 启动策略
+        ''' </summary>
+        ''' <param name="p_dr"></param>
+        ''' <param name="p_bgwList"></param>
+        ''' <returns></returns>
+        Private Function StartStrategy(ByVal p_dr As DataRow, ByRef p_bgwList As List(Of Object)) As Boolean
+
+            '当策略不存在运行列表中，启动策略
+            _idFindStrategy1 = p_dr.Item("id")
+            If IsNothing(p_bgwList.Find(AddressOf FindStrategy1)) = True Then
+                Dim objUserStrategy As Object = Nothing
+
+                Select Case p_dr.Item("strategytypeid")
+                    Case 1003
+                        objUserStrategy = New Strategy.GridSpot(p_dr)
+                    Case 1002
+                        objUserStrategy = New Strategy.GridContractLong(p_dr)
+                    Case 1001
+                        objUserStrategy = New Strategy.GridContract(p_dr)
+                    Case Else
+                        Return True
+
+                End Select
+
+                objUserStrategy.Run()
+                p_bgwList.Add(objUserStrategy)
+
+            End If
+
+            Return True
+
+        End Function
+
+        ''' <summary>
+        ''' 停止策略
+        ''' </summary>
+        ''' <param name="p_dr"></param>
+        ''' <param name="p_bgwList"></param>
+        ''' <returns></returns>
+        Private Function StopStrategy(ByVal p_dr As DataRow, ByRef p_bgwList As List(Of Object)) As Boolean
+
+            _idFindStrategy1 = p_dr.Item("id")
+            If IsNothing(p_bgwList.Find(AddressOf FindStrategy1)) = False Then
+
+                p_bgwList.Find(AddressOf FindStrategy1).StopRun()
+
+            End If
+
+            Return True
+
+        End Function
+
+        ''' <summary>
+        ''' 从列表中清除暂停的策略
+        ''' </summary>
+        ''' <returns></returns>
+        Private Function ClearStrategyList() As Integer
+
+            Dim ret As Integer = bgwList.RemoveAll(AddressOf FindStrategy)
+            Return ret
+        End Function
 
 #End Region
 
@@ -264,7 +250,6 @@ Namespace PublicData
             End If
         End Function
 
-
         ''' <summary>
         ''' 委托函数，搜索的条件
         ''' </summary>
@@ -277,13 +262,10 @@ Namespace PublicData
                 Return False
             End If
         End Function
+
         Dim _idFindStrategy1 As String
 
 #End Region
-
-
-
-
 
     End Class
 

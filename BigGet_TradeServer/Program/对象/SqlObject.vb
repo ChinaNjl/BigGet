@@ -1,9 +1,19 @@
-﻿Public Class SqlObject
+﻿''' <summary>
+''' 数据库链接设置
+''' </summary>
+Public Class SqlObject
+
+#Region "属性"
+
     Public Property SqlServer As String
     Public Property SqlPort As String
     Public Property SqlUser As String
     Public Property SqlPassword As String
     Public Property Database As String
+
+    Public Property _AllowUserVariables As Boolean = True
+
+    Public Property _SslMode As String = "None"
 
     ''' <summary>
     ''' 默认true
@@ -17,7 +27,6 @@
             _AllowUserVariables = value
         End Set
     End Property
-    Dim _AllowUserVariables As Boolean = True
 
     ''' <summary>
     ''' 默认None
@@ -31,8 +40,6 @@
             _SslMode = value
         End Set
     End Property
-    Dim _SslMode As String = "None"
-
 
     Public ReadOnly Property ConnectStr As String
         Get
@@ -51,5 +58,7 @@
 
         End Get
     End Property
+
+#End Region
 
 End Class

@@ -1,20 +1,18 @@
-﻿
-Imports System.Threading.Thread
+﻿Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
 Imports System.Runtime.InteropServices.WindowsRuntime
 Imports System.Runtime.InteropServices
 
-
 Namespace PublicData
+
     Public Class GetTickers
 
-
-
-
 #Region "*****************对象和变量设置********************"
+
         Private Property sql As UserType.SqlInfo = PublicConf.Sql
-        Private Property userKey As Api.UserInfo = PublicConf.PublicUserKey
+        Private Property userKey As Api.UserKeyInfo = PublicConf.PublicUserKey
+
         Public Property RefDelay As Integer
             Get
                 Return _RefDelay
@@ -23,6 +21,7 @@ Namespace PublicData
                 _RefDelay = value
             End Set
         End Property
+
         Dim _RefDelay As Integer = 2000
 
         Public ReadOnly Property TableName As String
@@ -37,8 +36,6 @@ Namespace PublicData
 
 #End Region
 
-
-
         ''' <summary>
         ''' 读取所有币种的行情数据
         ''' </summary>
@@ -47,7 +44,7 @@ Namespace PublicData
         Private Sub DoWorkGetTickers(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
             Dim Worker As BackgroundWorker = CType(sender, BackgroundWorker)
-            Dim UserCall As New Api.UserObject.Contract.UserCall(userKey)
+            Dim UserCall As New Api.User.UserCall(userKey)
 
             Dim count As Integer = 1
 
@@ -55,7 +52,7 @@ Namespace PublicData
                 '线程控制线程退出循环
                 If Worker.CancellationPending Then Exit Do
 
-                Dim ret As Api.UserType.Contract.ReplyType.MarkTickers = UserCall.GetMarkTickers("umcbl")
+                Dim ret As Api.Api.Request.Contract.ReplyType.MarkTickers = UserCall.ContractGetMarkTickers("umcbl")
 
                 '刷新Tickers
                 If ret.code = "00000" Then
@@ -74,11 +71,9 @@ Namespace PublicData
                             End If
 
                         Next
-
                     Else
                         Debug.Print("Error:{0}.{1}        {2}", MyBase.ToString, "DoWorkGetTickers", "标的数据为空")
                     End If
-
                 Else
                     Debug.Print("Error:{0}.{1}        {2}", MyBase.ToString, "DoWorkGetTickers", ret.msg)
                 End If
@@ -93,8 +88,6 @@ Namespace PublicData
             Loop
 
         End Sub
-
-
 
         ''' <summary>
         ''' Tickers.Tables(TableName).Rows的中数据更新到PublicConf.Tickers.Tables(TableName).Rows
@@ -119,16 +112,11 @@ Namespace PublicData
                     PublicConf.Tickers.Tables(TableName).Rows.Add(ndr)
                 End If
 
-
-
             Next
 
         End Sub
 
-
-
 #Region "**************************功能函数**********************************"
-
 
         ''' <summary>
         ''' 读取表
@@ -201,15 +189,12 @@ Namespace PublicData
             bgw.CancelAsync()
         End Sub
 
-
         Public Function WorkerIsBusy() As Boolean
             Return bgw.IsBusy
         End Function
 
 #End Region
 
-
     End Class
-
 
 End Namespace

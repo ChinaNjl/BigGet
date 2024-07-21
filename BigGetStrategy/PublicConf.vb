@@ -1,10 +1,4 @@
-﻿
-
-
-
-
-
-Public Class PublicConf
+﻿Public Class PublicConf
 
     ''' <summary>
     ''' 对外输出Tickers，时效性低
@@ -24,13 +18,10 @@ Public Class PublicConf
     ''' 公共api使用的Userkey
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Property PublicUserKey As New Api.UserInfo With {
+    Public Shared Property PublicUserKey As New Api.UserKeyInfo With {
         .ApiKey = "",
         .Secretkey = "",
         .Passphrase = "",
         .Host = "api.bitget.com"}
-
-
-
 
 End Class

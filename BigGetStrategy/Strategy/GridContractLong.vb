@@ -1,5 +1,4 @@
-﻿
-Imports System.Threading.Thread
+﻿Imports System.Threading.Thread
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
 
@@ -14,20 +13,14 @@ Namespace Strategy
     ''' </summary>
     Public Class GridContractLong
 
-#Region "临时设置"
-
-#End Region
-
-
-
 #Region "*********************对象和变量*********************"
-
 
         ''' <summary>
         ''' true:策略信息获取成功，false：策略信息获取失败
         ''' </summary>
         ''' <returns></returns>
         Public Property flgInitializen As Boolean = False
+
         Public Property State As Boolean = False                '策略运行状态
 
 #Region "--------------------对象设置------------------------"
@@ -36,16 +29,15 @@ Namespace Strategy
 
         Public bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}     '策略线程
 
-        Private Property UserInfo As Api.UserInfo
+        Private Property UserInfo As Api.UserKeyInfo
 
-        Private UserCall As Api.UserObject.Contract.UserCall
+        Private UserCall As Api.User.UserCall
 
         Private Property dsStrategyInfo As New DataSet
 
         Private Property myadp As MySqlDataAdapter
 
 #End Region
-
 
 #Region "----------------------产品基本信息-------------------------"
 
@@ -62,6 +54,7 @@ Namespace Strategy
                 Return _max
             End Get
         End Property
+
         Dim _max As Single = 0
 
         ''' <summary>
@@ -78,6 +71,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _id As String = ""
 
         ''' <summary>
@@ -94,6 +88,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _size As String = ""
 
         ''' <summary>
@@ -110,6 +105,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _priceChange As Single = -1
 
         ''' <summary>
@@ -126,9 +122,9 @@ Namespace Strategy
                     Return _upLine
                 End If
 
-
             End Get
         End Property
+
         Dim _upLine As Single = -1
 
         ''' <summary>
@@ -146,6 +142,7 @@ Namespace Strategy
 
             End Get
         End Property
+
         Dim _downLine As Single = -1
 
         ''' <summary>
@@ -165,6 +162,7 @@ Namespace Strategy
                 _startPrice = value
             End Set
         End Property
+
         Dim _startPrice As Single = -1
 
         ''' <summary>
@@ -181,6 +179,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _symbol As String = ""
 
         ''' <summary>
@@ -197,6 +196,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _marginCoin As String = ""
 
         ''' <summary>
@@ -213,6 +213,7 @@ Namespace Strategy
                 End If
             End Get
         End Property
+
         Dim _productType As String = ""
 
         ''' <summary>
@@ -226,13 +227,9 @@ Namespace Strategy
             End Get
         End Property
 
-
 #End Region
 
-
 #End Region
-
-
 
 #Region "*********************过程和方法********************"
 
@@ -268,7 +265,6 @@ Namespace Strategy
             Dim commandBuilder As New MySqlCommandBuilder(myadp)
             myadp.MissingSchemaAction = MissingSchemaAction.AddWithKey      '加上默认主键
 
-
             Try
                 myadp.Fill(dsStrategyInfo, "strategytable")   '将读取到的内容存入ds中
             Catch ex As Exception
@@ -279,7 +275,6 @@ Namespace Strategy
             Return True
 
         End Function
-
 
         ''' <summary>
         ''' 更新变动的数据
@@ -298,13 +293,9 @@ Namespace Strategy
 
         End Function
 
-
-
 #End Region
 
-
 #Region "-----------------2 Backgroundwork设置----------------------"
-
 
         ''' <summary>
         ''' 启动策略
@@ -312,13 +303,13 @@ Namespace Strategy
         Public Sub Run()
 
             '创建api对象
-            UserInfo = New Api.UserInfo With {
+            UserInfo = New Api.UserKeyInfo With {
                 .ApiKey = dsStrategyInfo.Tables("strategytable").Rows(0).Item("apikey"),
                 .Secretkey = dsStrategyInfo.Tables("strategytable").Rows(0).Item("secretkey"),
                 .Passphrase = dsStrategyInfo.Tables("strategytable").Rows(0).Item("passphrase"),
                 .Host = dsStrategyInfo.Tables("strategytable").Rows(0).Item("host")
             }
-            UserCall = New Api.UserObject.Contract.UserCall(UserInfo)
+            UserCall = New Api.User.UserCall(UserInfo)
 
             '启动策略
             If bgw.IsBusy = False Then
@@ -348,13 +339,11 @@ Namespace Strategy
 
             '获取本策略的带单数据,并得到最小带单的止盈价
 
-
-
             Do
 
-                Dim CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack = GetCurrentTrack()
+                Dim CurrentTrack As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack = GetCurrentTrack()
 
-                Dim CurrentOrders As Api.UserType.Contract.ReplyType.OrderCurrent = GetOrdersCurrent()
+                Dim CurrentOrders As Api.Api.Request.Contract.ReplyType.OrderCurrent = GetOrdersCurrent()
 
                 OpenOrders(CurrentTrack, CurrentOrders, upLine, downLine, priceChange)
 
@@ -375,22 +364,18 @@ Namespace Strategy
 
 #End Region
 
-
 #Region "------------------------2 自定义函数-------------------------"
 
-
-        Private Function OpenOrders(p_CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack,
-                                    p_CurrentOrders As Api.UserType.Contract.ReplyType.OrderCurrent,
+        Private Function OpenOrders(p_CurrentTrack As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack,
+                                    p_CurrentOrders As Api.Api.Request.Contract.ReplyType.OrderCurrent,
                                     p_upline As Single,
                                     p_downline As Single,
                                     p_change As Single) As Boolean
-
 
             Do
                 Dim ret1 As Boolean = p_CurrentTrack.FindStopProfitPrice(p_upline)
                 Dim newPrice As Single = p_upline - p_change
                 Dim ret2 As Boolean = p_CurrentOrders.FindPrice(newPrice)
-
 
                 If ret1 And ret2 Then
                 Else
@@ -403,7 +388,6 @@ Namespace Strategy
                         Sleep(1000)
                     End If
 
-
                 End If
 
                 p_upline = newPrice
@@ -413,51 +397,48 @@ Namespace Strategy
 
         End Function
 
-
-
-
         ''' <summary>
         ''' 搜索本策略的委托。
         ''' </summary>
         ''' <returns></returns>
-        Private Function GetOrdersCurrent() As Api.UserType.Contract.ReplyType.OrderCurrent
+        Private Function GetOrdersCurrent() As Api.Api.Request.Contract.ReplyType.OrderCurrent
 
-            Dim retCurrent As Api.UserType.Contract.ReplyType.OrderCurrent = UserCall.GetOrderCurrent(symbol)
+            Dim retCurrent As Api.Api.Request.Contract.ReplyType.OrderCurrent = UserCall.ContractGetOrderCurrent(symbol)
 
             Dim ret As Integer = retCurrent.data.RemoveAll(AddressOf FundCurrentOrders)
 
             Return retCurrent
 
         End Function
-        Private Function FundCurrentOrders(c As Api.UserType.Contract.ReplyType.OrderCurrent.DataType) As Boolean
+
+        Private Function FundCurrentOrders(c As Api.Api.Request.Contract.ReplyType.OrderCurrent.DataType) As Boolean
             Dim coid As String = c.clientOid
             Dim arr = coid.Split("_")
             Return arr(0) <> id
         End Function
 
-
         ''' <summary>
         ''' 获取本策略的带单
         ''' </summary>
         ''' <returns></returns>
-        Private Function GetCurrentTrack() As Api.UserType.Contract.ReplyType.TraceCurrentTrack
-            Return (FindCurrentTrackForID(UserCall.TraceCurrentTrack(symbol, productType, 50, 1)))
+        Private Function GetCurrentTrack() As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack
+            Return (FindCurrentTrackForID(UserCall.ContractTraceCurrentTrack(symbol, productType, 50, 1)))
         End Function
-        Private Function FindCurrentTrackForID(p_CurrentTrack As Api.UserType.Contract.ReplyType.TraceCurrentTrack) As Api.UserType.Contract.ReplyType.TraceCurrentTrack
+
+        Private Function FindCurrentTrackForID(p_CurrentTrack As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack) As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack
 
             Dim ret As Integer = p_CurrentTrack.data.RemoveAll(AddressOf FindCurrentTrack)
 
             Return p_CurrentTrack
 
         End Function
-        Private Function FindCurrentTrack(c As Api.UserType.Contract.ReplyType.TraceCurrentTrack.Datum) As Boolean
+
+        Private Function FindCurrentTrack(c As Api.Api.Request.Contract.ReplyType.TraceCurrentTrack.Datum) As Boolean
             Dim oid As String = c.openOrderId
-            Dim coid As String = UserCall.GetOrderDetail(symbol, oid).data.clientOid
+            Dim coid As String = UserCall.ContractGetOrderDetail(symbol, oid).data.clientOid
             Dim arr = coid.Split("_")
             Return arr(0) <> id
         End Function
-
-
 
         ''' <summary>
         ''' 初始化委托,返回最后一次下单的价格
@@ -473,7 +454,6 @@ Namespace Strategy
                                         p_size As String,
                                         p_change As Single,
                                         p_MaxPrice As Single) As Single
-
 
             Do
                 Dim newPrice As Single = p_startPrice - p_change
@@ -491,7 +471,6 @@ Namespace Strategy
                     Exit Do
                 End If
             Loop
-
 
             Return p_startPrice
 
@@ -513,7 +492,6 @@ Namespace Strategy
                     p_maxCurrentPrice = p_maxCurrentPrice + p_change
                     If ret1 = True Then Sleep(1000)
                 Loop
-
             Else
 
                 p_maxCurrentPrice = p_downline
@@ -526,12 +504,8 @@ Namespace Strategy
 
             End If
 
-
-
             Return True
         End Function
-
-
 
         ''' <summary>
         ''' 计算时间戳
@@ -555,7 +529,7 @@ Namespace Strategy
                                       p_marginCoin As String) As Boolean
 
             Try
-                Dim ret As Api.UserType.Contract.ReplyType.OrderCancelAllOrders = UserCall.OrderCancelAllOrders(p_productType, p_marginCoin)
+                Dim ret As Api.Api.Request.Contract.ReplyType.OrderCancelAllOrders = UserCall.ContractOrderCancelAllOrders(p_productType, p_marginCoin)
                 If ret.code = "00000" Then
                     Return True
                 Else
@@ -568,8 +542,6 @@ Namespace Strategy
 
             Return False
         End Function
-
-
 
         ''' <summary>
         ''' 开单
@@ -593,10 +565,10 @@ Namespace Strategy
                                    Optional _presetStopLossPrice As String = "") As Boolean
 
             '创建和设置批量下单参数，
-            Dim prarm As New Api.UserType.Contract.ParamType.OrderBatchOrders With {
+            Dim prarm As New Api.Api.Request.Contract.ParamType.OrderBatchOrders With {
                 .symbol = _symbol,
                 .marginCoin = _marginCoin}
-            Dim order As New Api.UserType.Contract.ParamType.OrderBatchOrders.orderData With {
+            Dim order As New Api.Api.Request.Contract.ParamType.OrderBatchOrders.orderData With {
                 .price = _price.ToString,
                 .size = _size.ToString,
                 .side = _side.ToString,
@@ -609,14 +581,13 @@ Namespace Strategy
             '下单和返回结果
             Try
 
-                Dim ret As Api.UserType.Contract.ReplyType.OrderBatchOrders = UserCall.OrderBatchOrders(prarm)
+                Dim ret As Api.Api.Request.Contract.ReplyType.OrderBatchOrders = UserCall.ContractOrderBatchOrders(prarm)
                 Debug.Print(ret.ToJson)
                 If ret.data.orderInfo.Count > 0 Then
                     Return True
                 Else
                     Debug.Print(ret.ToJson)
                 End If
-
             Catch ex As Exception
 
                 Debug.Print(“Error：TrendContract/OpenOrder”)
@@ -625,8 +596,6 @@ Namespace Strategy
 
             Return False
         End Function
-
-
 
         ''' <summary>
         ''' 反手
@@ -642,15 +611,14 @@ Namespace Strategy
                                   _side As String) As Boolean
 
             '创建反手参数对象，并设置参数
-            Dim prarm As New Api.UserType.Contract.ParamType.OrderPlaceOrder With {
+            Dim prarm As New Api.Api.Request.Contract.ParamType.OrderPlaceOrder With {
                 .symbol = _symbol,
                 .marginCoin = _marginCoin,
                 .size = _size,
                 .side = _side,
                 .orderType = "market"}
 
-
-            Dim ret As Api.UserType.Contract.ReplyType.OrderPlaceOrder = UserCall.OrderPlaceOrder(prarm)
+            Dim ret As Api.Api.Request.Contract.ReplyType.OrderPlaceOrder = UserCall.ContractOrderPlaceOrder(prarm)
             Debug.Print(ret.ToJson)
             If ret.code = "00000" Then
                 Return True
@@ -660,30 +628,10 @@ Namespace Strategy
 
         End Function
 
-
-
-
-
 #End Region
 
-
 #End Region
-
-
-
-
-
-
 
     End Class
 
-
 End Namespace
-
-
-
-
-
-
-
-

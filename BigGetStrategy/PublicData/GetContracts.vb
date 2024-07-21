@@ -4,14 +4,14 @@ Imports System.Data.SqlClient
 Imports MySql.Data.MySqlClient
 Imports System.Threading.Thread
 
-
-
 Namespace PublicData
+
     Public Class GetContracts
 
         'Public Property ds As DataSet
         Public Property sql As UserType.SqlInfo = PublicConf.Sql
-        Public Property userKey As Api.UserInfo = PublicConf.PublicUserKey
+
+        Public Property userKey As Api.UserKeyInfo = PublicConf.PublicUserKey
         Private Property myadp As MySqlDataAdapter
 
         Private Shared bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
@@ -45,14 +45,12 @@ Namespace PublicData
         ''' <returns></returns>
         Public Function Update() As Boolean
 
-
             Try
                 myadp.Update(PublicConf.DtContracts, "contracttable")
             Catch ex As Exception
                 Debug.Print(ex.Message)
                 Return False
             End Try
-
 
             Return True
         End Function
@@ -71,14 +69,12 @@ Namespace PublicData
 
             Dim Worker As BackgroundWorker = CType(sender, BackgroundWorker)
 
-            Dim userCall As New Api.UserObject.Contract.UserCall(userKey)
-
+            Dim userCall As New Api.User.UserCall(userKey)
 
             '从bigget上读取合约信息
-            Dim ret As Api.UserType.Contract.ReplyType.MarketContracts = userCall.GetMarkContracts("umcbl")
+            Dim ret As Api.Api.Request.Contract.ReplyType.MarketContracts = userCall.ContractGetMarkContracts("umcbl")
 
             If ret.code = "00000" Then
-
 
                 For Each d In ret.data
                     Dim dList As New List(Of String) From {
@@ -115,23 +111,8 @@ Namespace PublicData
                 Debug.Print("Error:{0}.{1}        {2}", MyBase.ToString, "DoWorkGetContracts", ret.msg)
             End If
 
-
-
-
         End Sub
 
-
-
-
-
-
-
-
     End Class
+
 End Namespace
-
-
-
-
-
-
