@@ -1,4 +1,7 @@
-﻿Public Class PublicConf
+﻿Imports System.Security.Cryptography.Xml
+Imports Mysqlx.XDevAPI.Relational
+
+Public Class PublicConf
 
     ''' <summary>
     ''' 对外输出Tickers，时效性低
@@ -6,10 +9,14 @@
     ''' <returns></returns>
     Public Shared Property Tickers As New DataSet
 
-    Public Shared Property DtContracts As New DataSet
+    ''' <summary>
+    ''' 公共行情信息dataset
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Property PublicData As New DataSet
 
     ''' <summary>
-    ''' sql服务器信息
+    ''' UserSQL服务器信息
     ''' </summary>
     ''' <returns></returns>
     Public Shared Property Sql As New UserType.SqlInfo

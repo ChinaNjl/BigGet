@@ -1,5 +1,6 @@
 ﻿Imports Api
 Imports BigGet_TradeServer.Program.Form.ParentForm.DataGridView
+Imports BigGetStrategy
 Imports Google.Protobuf.WellKnownTypes
 Imports System.Threading.Thread
 
@@ -77,8 +78,8 @@ Public Class MainForm
             Label2.Text = "后台获取策略.....关闭"
         End If
 
-        If PublicGetUserStrategy.bgwList.Count > 0 Then
-            If PublicGetUserStrategy.bgwList(0).bgw.IsBusy Then
+        If PublicGetUserStrategy.BgwList.Count > 0 Then
+            If PublicGetUserStrategy.BgwList(0).state Then
                 Label3.Text = "后台策略运行.....打开"
             Else
                 Label3.Text = "后台策略运行.....关闭"

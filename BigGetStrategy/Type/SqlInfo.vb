@@ -1,13 +1,35 @@
-﻿
-
-
-Namespace UserType
+﻿Namespace UserType
 
     Public Class SqlInfo
+
+        ''' <summary>
+        ''' 数据库服务器ip地址
+        ''' </summary>
+        ''' <returns></returns>
         Public Property SqlServer As String
+
+        ''' <summary>
+        ''' 数据库服务器端口
+        ''' </summary>
+        ''' <returns></returns>
         Public Property SqlPort As String
+
+        ''' <summary>
+        ''' 数据库用户名
+        ''' </summary>
+        ''' <returns></returns>
         Public Property SqlUser As String
+
+        ''' <summary>
+        ''' 数据库密码
+        ''' </summary>
+        ''' <returns></returns>
         Public Property SqlPassword As String
+
+        ''' <summary>
+        ''' 数据库名
+        ''' </summary>
+        ''' <returns></returns>
         Public Property Database As String
 
         ''' <summary>
@@ -22,6 +44,7 @@ Namespace UserType
                 _AllowUserVariables = value
             End Set
         End Property
+
         Dim _AllowUserVariables As Boolean = True
 
         ''' <summary>
@@ -36,8 +59,8 @@ Namespace UserType
                 _SslMode = value
             End Set
         End Property
-        Dim _SslMode As String = "None"
 
+        Dim _SslMode As String = "None"
 
         Public ReadOnly Property ConnectStr As String
             Get
@@ -56,8 +79,7 @@ Namespace UserType
 
             End Get
         End Property
+
     End Class
-
-
 
 End Namespace

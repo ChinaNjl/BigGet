@@ -1,8 +1,4 @@
-﻿
-
-
-Namespace Program.Form.ParentForm.DataGridView
-
+﻿Namespace Program.Form.ParentForm.DataGridView
 
     Public Class DataGridView3Class
 
@@ -11,8 +7,6 @@ Namespace Program.Form.ParentForm.DataGridView
         ''' </summary>
         Public Shared Sub Initialize()
 
-
-
             '读取初始化所有策略信息
             Call PublicGetUserStrategy.OpenTableFromDatabase()
 
@@ -20,10 +14,10 @@ Namespace Program.Form.ParentForm.DataGridView
             MainForm.DataGridView3.DataSource = PublicGetUserStrategy.ds.Tables(PublicGetUserStrategy.TableName)
 
             '启动策略
-            'PublicGetUserStrategy.Run()
+            PublicGetUserStrategy.Run()
 
         End Sub
-    End Class
 
+    End Class
 
 End Namespace

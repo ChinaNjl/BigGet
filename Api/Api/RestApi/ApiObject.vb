@@ -1,168 +1,118 @@
 ﻿Imports System.Threading.Thread
 Imports System.Net.Http.Headers
+Imports System.Text
+Imports System.Text.Json
 
 Namespace Api.RestApi
 
     Public Class ApiObject
 
-        Private Property UserInfo As UserKeyInfo
-        Private Property Api As Api.RestApi.ApiType
+#Region "内部属性变量和对象"
 
-        Private ReadOnly Property Signer As UserObject.OtherObject.Signer
-            Get
-                If IsNothing(_Signer) = True Then
-                    _Signer = New UserObject.OtherObject.Signer With {.Secret_Key = UserInfo.Secretkey}
-                End If
+        Private UserInfo As UserKeyInfo
+        Private Api As Api.RestApiAddress.ApiType
 
-                Return _Signer
-            End Get
-        End Property
+        Private HttpRequest As HttpRequest
+        Private que As New Queue(Of Int64)
 
-        Dim _Signer As UserObject.OtherObject.Signer
+#End Region
 
-        Private HttpRequest As New UserObject.OtherObject.HttpRequest
-
-        Sub New(_UserInfo As UserKeyInfo, _Api As Api.RestApi.ApiType)
-            UserInfo = _UserInfo
-            Api = _Api
-        End Sub
+#Region "外部属性变量和对象"
 
         ''' <summary>
-        ''' 保存最近一次调用api的返回值
+        ''' 保存最近一次调用api返回类型的json值
         ''' </summary>
         ''' <returns></returns>
-        Public Property resualt
-            Get
-                Return _resualt
-            End Get
-            Set(value)
-                _resualt = value
-            End Set
-        End Property
-
-        Dim _resualt
+        Public Property strLastResualt As String
 
         ''' <summary>
         ''' 访问参数
         ''' </summary>
         ''' <returns></returns>
-        Public Property Param
-            Get
-                Return _temp_Param
-            End Get
-            Set(value)
-                _temp_Param = value
-            End Set
-        End Property
+        Public Property Param As Object
 
-        Dim _temp_Param As Object = Nothing
+#End Region
 
-        ''' <summary>
-        ''' 设置头信息
-        ''' </summary>
-        Private Sub HttpRequestHeader()
-            Dim UtcTime = TimeZoneInfo.ConvertTimeToUtc(Now).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-            UtcTime = CType(ts.TotalMilliseconds, Int64)
+#Region "公有方法"
 
-            HttpRequest.httpclient.DefaultRequestHeaders.Clear()
+        Sub New(_UserInfo As UserKeyInfo, _Api As Api.RestApiAddress.ApiType)
+            UserInfo = _UserInfo
+            Api = _Api
 
-            HttpRequest.httpclient.DefaultRequestHeaders.Accept.Add(New MediaTypeWithQualityHeaderValue("application/json"))
-            HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-KEY", UserInfo.ApiKey)
-            HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-TIMESTAMP", UtcTime)
-            HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-PASSPHRASE", UserInfo.Passphrase)
-            HttpRequest.httpclient.DefaultRequestHeaders.Add("locale", "zh-CN")
-
-            If Api.Method = "GET" Then
-
-                '对有无参数进行处理
-                If IsNothing(Param) = True Then
-                    '无参数
-                    HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-SIGN", Signer.Sign(UtcTime, Api.Method, Api.Address, ""))
-                Else
-                    '有参数
-                    HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-SIGN", Signer.Sign(UtcTime, Api.Method, Api.Address, Param.BuildParams))
-                End If
-
-            End If
-
-            If Api.Method = "POST" Then
-                '对有无参数进行处理
-                If IsNothing(Param) = True Then
-                    '无参数
-                    HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-SIGN", Signer.Sign(UtcTime, Api.Method, Api.Address, ""))
-                Else
-                    '有参数
-                    HttpRequest.httpclient.DefaultRequestHeaders.Add("ACCESS-SIGN", Signer.Sign(UtcTime, Api.Method, Api.Address, Param.tojson))
-                End If
-            End If
-
+            HttpRequest = New HttpRequest(_UserInfo, _Api)
         End Sub
-
-        Private Property que As New Queue(Of Int64)
-
-        Private ReadOnly Property delay As Integer
-            Get
-                If _delay = -1 Then
-                    _delay = Api.Time * 1000 / Api.Count
-                End If
-
-                Return _delay
-            End Get
-        End Property
-
-        Dim _delay As Integer = -1
 
         Public Function Value(Of T)()
 
-            Dim _UrlBuilder As New UserObject.OtherObject.PublicUrlBuilder With {
-                .Host = UserInfo.Host,
-                ._Api = Api}
-            Dim url As String
-
             '当访问频率过高的时候执行延迟
-            If que.Count = Api.Count Then
-                Dim c As Int64 = que.Last - que.Peek
-                If c <= Api.Time Then
-                    Sleep(Api.Time - c + 10)
-                End If
-            End If
+            Api.Delay()
 
-            If Api.Method = "GET" Then
+            Dim _UrlBuilder As New PublicUrlBuilder With {
+                    .Host = UserInfo.Host,
+                    ._Api = Api}
+            Dim resualt As String = ""   '保存api返回值
 
-                If IsNothing(Param) = False Then
-                    url = _UrlBuilder.Build(Param)
-                Else
-                    url = _UrlBuilder.Build()
-                End If
+            Select Case Api.Method
+                Case "GET"
 
-                Call HttpRequestHeader()
-                resualt = HttpRequest.GetData(Of T)(url)
+                    '根据有无参数进行处理
+                    If IsNothing(Param) Then
+                        Dim url As String = _UrlBuilder.Build()
+                        strLastResualt = HttpRequest.GetWebApi(url)
+                    Else
+                        Dim url As String = _UrlBuilder.Build(Param)
+                        strLastResualt = HttpRequest.GetWebApi(url, Param.BuildParams)
+                    End If
 
-                Return resualt
+                Case "POST"
 
-            End If
+                    '根据有无参数进行处理
+                    If IsNothing(Param) Then
+                        '无参数post
+                        Dim url As String = _UrlBuilder.Build()
+                        strLastResualt = HttpRequest.Post(url)
+                    Else
+                        '带参数post
+                        Dim url As String = _UrlBuilder.Build()
+                        strLastResualt = HttpRequest.Post(url, Param.toJson)
+                    End If
 
-            If Api.Method = "POST" Then
+                Case Else
 
-                url = _UrlBuilder.Build()
-
-                Call HttpRequestHeader()
-                resualt = HttpRequest.PostAsync(Of T)(url, Param.toJson)
-
-                Return resualt
-
-            End If
+            End Select
 
             '将访问时间保存到que队列的末尾,超过最大数量，则删除开头的一次记录
-            Dim ts As TimeSpan = Date.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-            que.Enqueue(CType(ts.TotalMilliseconds, Int64))
-            If que.Count > Api.Count Then
-                que.Dequeue()
-            End If
+            Api.Add()
 
-            Return Nothing
+            Param = Nothing '初始化param参数
+            Return JsonStrToObject(Of T)(strLastResualt)
+
         End Function
+
+#End Region
+
+#Region "私有方法"
+
+        ''' <summary>
+        ''' json反序列化
+        ''' </summary>
+        ''' <param name="json"></param>
+        ''' <returns></returns>
+        Friend Function JsonStrToObject(Of T)(ByVal json As String)
+
+            Try
+                'Dim weatherForecast = JsonSerializer.Deserialize(Of T)(json)
+                Dim weatherForecast = JsonSerializer.Deserialize(Of T)(Encoding.UTF8.GetBytes(json))
+                Return weatherForecast
+            Catch ex As Exception
+                Dim ret As String = "{""code"":""9998"",""msg"":""{0}""}"
+                ret = ret.Replace("{0}"， ex.Message)
+                Return JsonSerializer.Deserialize(Of T)(Encoding.UTF8.GetBytes(ret))
+            End Try
+
+        End Function
+
+#End Region
 
     End Class
 

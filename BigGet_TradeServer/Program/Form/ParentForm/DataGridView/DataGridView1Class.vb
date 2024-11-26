@@ -1,4 +1,4 @@
-﻿
+﻿Imports BigGetStrategy
 Imports BigGetStrategy.PublicData
 
 Namespace Program.Form.ParentForm.DataGridView
@@ -10,15 +10,12 @@ Namespace Program.Form.ParentForm.DataGridView
         ''' </summary>
         Public Shared Sub Initialize()
 
-            '初始化dataset结构，然后设置datagridview数据源
-            Call PublicGetTickers.ReadTable()
-            MainForm.DataGridView1.DataSource = BigGetStrategy.PublicConf.Tickers.Tables(PublicGetTickers.TableName)
-
             '打开后台读取bigget信息
             PublicGetTickers.Run()
+            MainForm.DataGridView1.DataSource = BigGetStrategy.PublicConf.Tickers.Tables("tickertable")
+            PublicData.Run()
 
         End Sub
-
 
     End Class
 

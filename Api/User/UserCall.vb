@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Net.Security
+Imports System.Reflection
 Imports System.Text.Json
 Imports System.Threading
 
@@ -26,6 +27,18 @@ Namespace User
 #Region "行情接口"
 
         ''' <summary>
+        ''' 现货全部标的价格
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function SpotGetMarketTickers() As Api.Request.Spot.Reply.MarketTickers
+            Dim param As New GetRequestParamType(Nothing)
+
+            UserAPI.ContractMarketTicker.Param = param
+            Dim ret As Api.Request.Spot.Reply.MarketTickers = UserAPI.SpotMarketTickers.Value(Of Api.Request.Spot.Reply.MarketTickers)
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' 深度行情接口
         ''' </summary>
         ''' <param name="symbol"></param>
@@ -34,7 +47,7 @@ Namespace User
         Public Function ContractGetMarkDepth(symbol As String, limit As Integer) As Api.Request.Contract.ReplyType.MarkDepth
 
             '创建参数对象
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("symbol", symbol)
@@ -48,7 +61,7 @@ Namespace User
         End Function
 
         Public Function ContractGetMarkTickers(productType As String) As Api.Request.Contract.ReplyType.MarkTickers
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("productType", productType)
@@ -65,7 +78,7 @@ Namespace User
         ''' <param name="symbol"></param>
         ''' <returns></returns>
         Public Function ContractGetMarkTicker(symbol As String) As Api.Request.Contract.ReplyType.MarkTicker
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("symbol", symbol)
@@ -78,7 +91,7 @@ Namespace User
 
         Public Function ContractGetMarkContracts(productType As String) As Api.Request.Contract.ReplyType.MarketContracts
 
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("productType", productType)
@@ -97,7 +110,7 @@ Namespace User
                                         Optional kLineType As String = "market",
                                         Optional limit As String = "100") As Api.Request.Contract.ReplyType.MarketCandles
 
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("symbol", symbol)
@@ -123,6 +136,73 @@ Namespace User
 #Region "账户接口"
 
         ''' <summary>
+        ''' 获取账单流水
+        ''' </summary>
+        ''' <param name="p"></param>
+        ''' <returns></returns>
+        Public Function SpotAccountBills(Optional p As Api.Request.Spot.Param.AccountBills = Nothing) As Api.Request.Spot.Reply.AccountBills
+            UserAPI.SpotAccountBills.Param = p
+            Dim ret As Api.Request.Spot.Reply.AccountBills = UserAPI.SpotAccountBills.Value(Of Api.Request.Spot.Reply.AccountBills)
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' 获取所有子账户现货资产
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function SpotAccountSubAccountSpotAssets() As Api.Request.Spot.Reply.SubAccountSpotAssets
+
+            UserAPI.SpotAccountSubAccountSpotAssets.Param = Nothing
+            Dim ret As Api.Request.Spot.Reply.SubAccountSpotAssets = UserAPI.SpotAccountSubAccountSpotAssets.Value(Of Api.Request.Spot.Reply.SubAccountSpotAssets)
+
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' 获取有价账户资产
+        ''' </summary>
+        ''' <param name="coin"></param>
+        ''' <returns></returns>
+        Public Function SpotAccountAssetsLite(coin As String) As Api.Request.Spot.Reply.AssetsLite
+
+            Dim param As New GetRequestParamType(Nothing)
+            param.AddParam("coin", coin)
+
+            '写入参数字典
+            UserAPI.SpotAccountAssetsLite.Param = param
+            Dim ret As Api.Request.Spot.Reply.AssetsLite = UserAPI.SpotAccountAssetsLite.Value(Of Api.Request.Spot.Reply.AssetsLite)
+            Return ret
+
+        End Function
+
+        ''' <summary>
+        ''' 获取账户资产
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function SpotAccountAssetsLite() As Api.Request.Spot.Reply.AssetsLite
+
+            Dim param As New GetRequestParamType(Nothing)
+            '写入参数字典
+            UserAPI.SpotAccountAssetsLite.Param = param
+            Dim ret As Api.Request.Spot.Reply.AssetsLite = UserAPI.SpotAccountAssetsLite.Value(Of Api.Request.Spot.Reply.AssetsLite)
+            Return ret
+
+        End Function
+
+        ''' <summary>
+        ''' 获取账户资产(默认usdt)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function SpotAccountAssets(coin As String) As Api.Request.Spot.Reply.Assets
+            Dim param As New GetRequestParamType(Nothing)
+            '写入参数字典
+            param.AddParam("coin", coin)
+            UserAPI.SpotAccountAssets.Param = param
+            Dim ret As Api.Request.Spot.Reply.Assets = UserAPI.SpotAccountAssets.Value(Of Api.Request.Spot.Reply.Assets)
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' 用户信息
         ''' </summary>
         ''' <param name="productType"></param>
@@ -130,7 +210,7 @@ Namespace User
         Public Function ContractGetAccountAccounts(productType As String) As Api.Request.Contract.ReplyType.AccountAccounts
 
             '创建参数对象
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("productType", productType)
@@ -147,8 +227,12 @@ Namespace User
         ''' 获取ApiKey信息
         ''' </summary>
         ''' <returns></returns>
-        Public Function SpotGetAccountGetInfo() As Api.Request.Spot.ReplyType.AccountGetInfo
-            Return Nothing
+        Public Function SpotGetAccountGetInfo() As Api.Request.Spot.Reply.AccountGetInfo
+
+            Dim ret As Api.Request.Spot.Reply.AccountGetInfo = UserAPI.SpotAccountGetInfo.Value(Of Api.Request.Spot.Reply.AccountGetInfo)
+
+            Return ret
+
         End Function
 
 #End Region
@@ -156,7 +240,7 @@ Namespace User
 #Region "交易接口"
 
         ''' <summary>
-        ''' 下单
+        ''' 合约下单接口
         ''' </summary>
         ''' <param name="p"></param>
         ''' <returns></returns>
@@ -192,7 +276,7 @@ Namespace User
         ''' <returns></returns>
         Public Function ContractGetOrderCurrent(symbol As String) As Api.Request.Contract.ReplyType.OrderCurrent
 
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '参数写入参数字典
             param.AddParam("symbol", symbol)
@@ -207,7 +291,7 @@ Namespace User
 
         Public Function ContractGetOrderDetail(symbol As String, orderId As String) As Api.Request.Contract.ReplyType.OrderDetail
 
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '参数写入参数字典
             param.AddParam("symbol", symbol)
@@ -246,7 +330,7 @@ Namespace User
         Public Function ContractTraceCurrentTrack(symbol As String, productType As String, pageSize As Integer, pageNo As Integer) As Api.Request.Contract.ReplyType.TraceCurrentTrack
 
             '创建参数对象
-            Dim param As New UserObject.OtherObject.GetRequestParamType(Nothing)
+            Dim param As New GetRequestParamType(Nothing)
 
             '写入参数字典
             param.AddParam("symbol", symbol)

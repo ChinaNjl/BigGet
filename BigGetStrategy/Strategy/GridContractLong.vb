@@ -1,10 +1,9 @@
-﻿Imports System.Threading.Thread
+﻿Imports BigGetStrategy.PublicData
 Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
-
-Imports BigGetStrategy.PublicData
 Imports System.Data.OleDb
 Imports System.Security.Cryptography
+Imports System.Threading.Thread
 
 Namespace Strategy
 
@@ -48,7 +47,7 @@ Namespace Strategy
         Private ReadOnly Property max As Single
             Get
                 If _max = 0 Then
-                    _max = PublicConf.DtContracts.Tables("contracttable").Rows.Find(symbol).Item("buyLimitPriceRatio")
+                    _max = PublicConf.PublicData.Tables("contracttable").Rows.Find(symbol).Item("buyLimitPriceRatio")
                 End If
 
                 Return _max
@@ -222,7 +221,7 @@ Namespace Strategy
         ''' <returns></returns>
         Public ReadOnly Property Price As Single
             Get
-                Dim drTicker As DataRow = GetTickers.Tickers.Tables("tickertable").Rows.Find(symbol)
+                Dim drTicker As DataRow = PublicConf.PublicData.Tables("tickertable").Rows.Find(symbol)
                 Return drTicker.Item("last")
             End Get
         End Property

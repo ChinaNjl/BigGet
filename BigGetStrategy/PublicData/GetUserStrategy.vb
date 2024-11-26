@@ -15,14 +15,18 @@ Namespace PublicData
         Public Property sql As UserType.SqlInfo = PublicConf.Sql
         Public ReadOnly Property TableName As String = "strategytable"
         Public ReadOnly Property ColName As String = "id,strategytypeid,state"
-        Public Property bgwList As New List(Of Object)
+        Public Property BgwList As New List(Of Object)
 
         Private myadp As MySqlDataAdapter
         Private bgw As New BackgroundWorker With {.WorkerSupportsCancellation = True, .WorkerReportsProgress = True}
 
+        ''' <summary>
+        ''' 运行中的策略数量
+        ''' </summary>
+        ''' <returns></returns>
         Public ReadOnly Property BgwCount As Integer
             Get
-                Return bgwList.Count
+                Return BgwList.Count
             End Get
         End Property
 
@@ -51,6 +55,7 @@ Namespace PublicData
         ''' 启动线程：读取用户策略信息表
         ''' </summary>
         Public Sub Run()
+
             If bgw.IsBusy = False Then
                 AddHandler bgw.DoWork, AddressOf DoWorkUserStrategy
                 'AddHandler bgw.ProgressChanged, AddressOf ProgressChanged_GetTickeets
@@ -66,27 +71,32 @@ Namespace PublicData
         Public Sub DoWorkUserStrategy(ByVal sender As System.Object, ByVal e As DoWorkEventArgs)
 
             Dim dt As DataTable
-            Do
 
-                '把需要运行的策略保存到dataset对象中，然后再读取列表来分别启动
-                If OpenTableFromDatabase(BuildSql(ColName, TableName， "state=101 or state=102")) Then
-                    dt = ds.Tables(TableName)
-                    For Each dr As DataRow In dt.Rows
+            Try
+                Do
 
-                        If dr.Item("state") = 101 Then
-                            StartStrategy(dr, bgwList)
-                        End If
+                    '把需要运行的策略保存到dataset对象中，然后再读取列表来分别启动
+                    If OpenTableFromDatabase(BuildSql(ColName, TableName， "state=101 or state=102")) Then
+                        dt = ds.Tables(TableName)
+                        For Each dr As DataRow In dt.Rows
 
-                        If dr.Item("state") = 102 Then
-                            StopStrategy(dr, bgwList)
-                        End If
+                            If dr.Item("state") = 101 Then
+                                StartStrategy(dr, BgwList)
+                            End If
 
-                    Next
+                            If dr.Item("state") = 102 Then
+                                StopStrategy(dr, BgwList)
+                            End If
 
-                End If
-                Sleep(3000)
-                ClearStrategyList()
-            Loop
+                        Next
+
+                    End If
+                    Sleep(3000)
+                    ClearStrategyList()
+                Loop
+            Catch ex As Exception
+                Debug.Print(ex.Message)
+            End Try
 
         End Sub
 
@@ -173,19 +183,19 @@ Namespace PublicData
         ''' <summary>
         ''' 启动策略
         ''' </summary>
-        ''' <param name="p_dr"></param>
-        ''' <param name="p_bgwList"></param>
+        ''' <param name="p_dr">datarow形式的策略信息</param>
+        ''' <param name="p_bgwList">运行中的策略列表</param>
         ''' <returns></returns>
         Private Function StartStrategy(ByVal p_dr As DataRow, ByRef p_bgwList As List(Of Object)) As Boolean
 
             '当策略不存在运行列表中，启动策略
-            _idFindStrategy1 = p_dr.Item("id")
+            _idFindStrategy1 = p_dr.Item("id")  '获取策略id
             If IsNothing(p_bgwList.Find(AddressOf FindStrategy1)) = True Then
                 Dim objUserStrategy As Object = Nothing
 
                 Select Case p_dr.Item("strategytypeid")
                     Case 1003
-                        objUserStrategy = New Strategy.GridSpot(p_dr)
+                        objUserStrategy = New Strategy.GridSpot(p_dr, True)
                     Case 1002
                         objUserStrategy = New Strategy.GridContractLong(p_dr)
                     Case 1001
@@ -229,7 +239,7 @@ Namespace PublicData
         ''' <returns></returns>
         Private Function ClearStrategyList() As Integer
 
-            Dim ret As Integer = bgwList.RemoveAll(AddressOf FindStrategy)
+            Dim ret As Integer = BgwList.RemoveAll(AddressOf FindStrategy)
             Return ret
         End Function
 

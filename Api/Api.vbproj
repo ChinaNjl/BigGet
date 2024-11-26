@@ -65,8 +65,8 @@
     <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=8.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.8.0.4\lib\net462\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -103,15 +103,14 @@
     <Compile Include="Api\Request\Contract\Reply类型\OrderCurrent.vb" />
     <Compile Include="Api\Request\Contract\Reply类型\OrderDetail.vb" />
     <Compile Include="Api\Request\Contract\Reply类型\TraceCurrentTrack.vb" />
-    <Compile Include="Api\Request\Spot\Reply\AccountGetInfo.vb" />
+    <Compile Include="Api\Request\Spot\ReplyType.vb" />
     <Compile Include="Api\RestApi\ApiObject.vb" />
-    <Compile Include="User\OtherObject\GetRequestParamType.vb" />
+    <Compile Include="GetRequestParamType.vb" />
     <Compile Include="Api\Request\Contract\Param类型\OrderPlaceOrder.vb" />
     <Compile Include="Api\Request\Contract\Reply类型\AccountAccounts.vb" />
     <Compile Include="Api\Request\Contract\Reply类型\OrderPlaceOrder.vb" />
-    <Compile Include="Setting.vb" />
-    <Compile Include="User\OtherObject\HttpRequest.vb" />
-    <Compile Include="User\OtherObject\PublicUrlBuilder.vb" />
+    <Compile Include="HttpRequest.vb" />
+    <Compile Include="PublicUrlBuilder.vb" />
     <Compile Include="Api\RestApi\RestApi.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -128,10 +127,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="User\OtherObject\Signer.vb" />
+    <Compile Include="Signer.vb" />
     <Compile Include="Api\RestApi\UserAPI.vb" />
     <Compile Include="User\UserCall.vb" />
-    <Compile Include="UserInfo.vb" />
+    <Compile Include="UserKeyInfo.vb" />
     <Compile Include="Api\Request\Contract\Reply类型\MarkDepth.vb" />
   </ItemGroup>
   <ItemGroup>
