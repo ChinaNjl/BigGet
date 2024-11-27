@@ -22,8 +22,12 @@ Namespace Api.Request
                 ''' 序列化
                 ''' </summary>
                 ''' <returns></returns>
-                Public Function ToJson() As String
-                    Return JsonSerializer.Serialize(Me)
+                Public Function ToJson(Optional out As Boolean = False) As String
+                    Dim ret = JsonSerializer.Serialize(Me)
+                    If out Then
+                        Debug.Print(ret)
+                    End If
+                    Return ret
                 End Function
 
                 Public Class Datum
@@ -150,8 +154,12 @@ Namespace Api.Request
                 ''' 序列化
                 ''' </summary>
                 ''' <returns></returns>
-                Public Function ToJson() As String
-                    Return JsonSerializer.Serialize(Me)
+                Public Function ToJson(Optional out As Boolean = False) As String
+                    Dim ret As String = JsonSerializer.Serialize(Me)
+                    If out Then
+                        Debug.Print(ret)
+                    End If
+                    Return ret
                 End Function
 
                 Public Class Datum
@@ -211,6 +219,30 @@ Namespace Api.Request
 
             End Class
 
+            Public Class TradeOrders
+                Public Property code As String
+                Public Property msg As String
+                Public Property data As Datum
+
+                Public Class Datum
+                    Public Property orderId As String
+                    Public Property clientOrderId As String
+                End Class
+
+                ''' <summary>
+                ''' 序列化
+                ''' </summary>
+                ''' <returns></returns>
+                Public Function ToJson(Optional out As Boolean = False) As String
+                    Dim rep As String = JsonSerializer.Serialize(Me)
+                    If out Then
+                        Console.WriteLine(rep)
+                    End If
+                    Return rep
+                End Function
+
+            End Class
+
         End Namespace
 
         Namespace Param
@@ -230,6 +262,26 @@ Namespace Api.Request
                 ''' <returns></returns>
                 Public Function ToJson() As String
                     Return JsonSerializer.Serialize(Me)
+                End Function
+
+            End Class
+
+            Public Class TradeOrders
+                Public Property symbol As String
+                Public Property side As String
+                Public Property orderType As String
+                Public Property force As String
+                Public Property price As String
+                Public Property quantity As String
+                Public Property clientOrderId As String
+
+                ''' <summary>
+                ''' 序列化
+                ''' </summary>
+                ''' <returns></returns>
+                Public Function ToJson() As String
+                    Dim ret As String = JsonSerializer.Serialize(Me)
+                    Return ret
                 End Function
 
             End Class

@@ -270,6 +270,17 @@ Namespace User
         End Function
 
         ''' <summary>
+        ''' 现货下单接口
+        ''' </summary>
+        ''' <param name="p"></param>
+        ''' <returns></returns>
+        Public Function SpotTradeOrders(p As Api.Request.Spot.Param.TradeOrders) As Api.Request.Spot.Reply.TradeOrders
+            UserAPI.SpotTradeOrders.Param = p
+            Dim ret As Api.Request.Spot.Reply.TradeOrders = UserAPI.SpotTradeOrders.Value(Of Api.Request.Spot.Reply.TradeOrders)
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' 获取当前委托
         ''' </summary>
         ''' <param name="symbol"></param>

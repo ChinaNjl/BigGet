@@ -58,10 +58,10 @@ Namespace Api.RestApi
                     '根据有无参数进行处理
                     If IsNothing(Param) Then
                         Dim url As String = _UrlBuilder.Build()
-                        strLastResualt = HttpRequest.GetWebApi(url)
+                        strLastResualt = HttpRequest.GetHttpClient(url)
                     Else
                         Dim url As String = _UrlBuilder.Build(Param)
-                        strLastResualt = HttpRequest.GetWebApi(url, Param.BuildParams)
+                        strLastResualt = HttpRequest.GetHttpClient(url, Param.BuildParams)
                     End If
 
                 Case "POST"
@@ -70,11 +70,12 @@ Namespace Api.RestApi
                     If IsNothing(Param) Then
                         '无参数post
                         Dim url As String = _UrlBuilder.Build()
-                        strLastResualt = HttpRequest.Post(url)
+                        strLastResualt = HttpRequest.PostHttpClient(url)
                     Else
                         '带参数post
                         Dim url As String = _UrlBuilder.Build()
-                        strLastResualt = HttpRequest.Post(url, Param.toJson)
+                        Debug.Print(Param.tojson)
+                        strLastResualt = HttpRequest.PostHttpClient(url, Param.toJson)
                     End If
 
                 Case Else

@@ -192,7 +192,8 @@ Namespace Api.RestApiAddress
                 .Method = "POST",
                 .Address = "/api/spot/v1/trade/orders",
                 .Count = 10,
-                .Time = 1}
+                .Time = 1
+            }
 
         End Class
 

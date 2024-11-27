@@ -4,6 +4,8 @@ Imports System.ComponentModel
 Imports System.Runtime.InteropServices
 Imports System.Threading.Thread
 Imports ZstdSharp.Unsafe
+Imports Api.Api.Request
+Imports System.Data.Entity.Core.Mapping
 
 Namespace Strategy
 
@@ -64,6 +66,12 @@ Namespace Strategy
             End Get
         End Property
 
+        Public ReadOnly Property productType As String
+            Get
+                Return drUser.Item("productType")
+            End Get
+        End Property
+
         ''' <summary>
         ''' 返回计价货币
         ''' </summary>
@@ -84,6 +92,12 @@ Namespace Strategy
                 lst.Add(symbol & marginCoin)
                 Dim dtPrice As DataRow = PublicConf.PublicData.Tables("spot_tickers").Rows.Find(lst.ToArray)    '通过比对主键来查找特定行
                 Return dtPrice.Item(3)
+            End Get
+        End Property
+
+        Public ReadOnly Property SpotSymbol As String
+            Get
+                Return symbol & marginCoin & "_" & productType.ToUpper
             End Get
         End Property
 
@@ -177,9 +191,13 @@ Namespace Strategy
 
                     '获取标的和保证金币种数据
                     Dim repAssetsLite As Api.Api.Request.Spot.Reply.AssetsLite = UserCall.SpotAccountAssetsLite
-                    If repAssetsLite.code = "00000" And repAssetsLite.data.Count > 0 Then
-                        MarginCoinInformation = GetCoinInformation(marginCoin, repAssetsLite)
-                        SymbolInformation = GetCoinInformation(symbol, repAssetsLite)
+                    If repAssetsLite.code = "00000" Then
+                        If repAssetsLite.data.Count > 0 Then
+                            MarginCoinInformation = GetCoinInformation(marginCoin, repAssetsLite)
+                            SymbolInformation = GetCoinInformation(symbol, repAssetsLite)
+                        Else
+                            Exit Do
+                        End If
                     Else
                         Exit Do
                     End If
@@ -190,14 +208,42 @@ Namespace Strategy
                     Dim marginMarketValue As Single = MarginCoinInformation.available   '保证金市值’
                     Dim profit As Single = symbolMarketValue - marginMarketValue    '盈亏
                     Dim TotalMarketValueHalf As Single = (symbolMarketValue + marginMarketValue) / 2
-                    Dim diffValue As Single = TotalMarketValueHalf * 0.02   '计算交易阈值，默认为2%
+                    'Dim diffValue As Single = TotalMarketValueHalf * 0.02   '计算交易阈值，默认为2%
+                    Dim diffValue As Single = 40   '计算交易阈值，默认为2%
                     If profit > diffValue Then
                         '执行卖出symbol
+                        Dim rep As Spot.Reply.TradeOrders = UserCall.SpotTradeOrders(New Spot.Param.TradeOrders With {
+                                                                                                        .symbol = SpotSymbol,
+                                                                                                        .side = "sell",
+                                                                                                        .orderType = "market",
+                                                                                                        .force = "normal",
+                                                                                                        .quantity = Math.Round(CType(20 / price, Single), 4)})
+
+                        If rep.code = "00000" Then
+                            '记录交易信息
+
+                        End If
+                        rep.ToJson(True)
+
                     ElseIf profit < -diffValue Then
                         '执行买入symbol
+                        Dim rep As Spot.Reply.TradeOrders = UserCall.SpotTradeOrders(New Spot.Param.TradeOrders With {
+                                                                                                        .symbol = SpotSymbol,
+                                                                                                        .side = "buy",
+                                                                                                        .orderType = "market",
+                                                                                                        .force = "normal",
+                                                                                                        .quantity = "20"})
 
+                        If rep.code = "00000" Then
+                            '记录交易信息
+
+                        End If
+                        rep.ToJson(True)
+                    Else
+                        Debug.Print("等待....")
+                        Sleep(5000)
                     End If
-
+                    'Exit Sub
                 Loop
             Loop
 
